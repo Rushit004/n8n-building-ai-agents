@@ -1,0 +1,306 @@
+{
+  "name": "Notes and Q/A generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Get Notes and Q/A for any Topic",
+        "formDescription": "Fill the topic name and get the conices notes and interview level questions from the topic ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Enter the Topic name want to revise/explore.",
+              "placeholder": "Linear Regression in Machine Learning",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -576,
+        -80
+      ],
+      "id": "a4e67d5e-0bb3-4953-8148-9998940ddb11",
+      "name": "Topic Selection",
+      "webhookId": "c910480e-bde9-43a8-974b-5bc65b2dfb60"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        -48
+      ],
+      "id": "700d5137-8dee-42e0-b06b-c99f92a4ceca",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        288
+      ],
+      "id": "eddc3646-f9e4-4161-aad8-4ea81c8f517f",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate comprehensive, well-structured notes on the following topic:\n\nTopic: {{ $json['Enter the Topic name want to revise/explore.'] }}\n\nMake the notes clear, accurate, easy to understand, and suitable for studying and revision. Use appropriate headings, bullet points, examples, tables, and a concise summary where relevant. ",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert note-generation assistant.  Your task is to generate clear, accurate, well-structured study notes whenever you receive a topic or subject as input."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -272,
+        -240
+      ],
+      "id": "ac584ff6-66e6-48bf-8838-f8b5e942a36f",
+      "name": "Notes Generator"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate 10 Interview based MCQs on the following topic:\n\nTopic:{{ $json['Enter the Topic name want to revise/explore.'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert educational MCQ generator.  Your task is to generate exactly 10 multiple-choice questions (MCQs) based on the topic provided by the user.Question Requirements\nGenerate exactly 10 questions.\n\nEach question must:\n\nBe directly related to the provided topic.\n\nTest understanding, knowledge, application, or important concepts.\n\nHave exactly 4 options.\n\nHave exactly 1 correct answer.\n\nUse options labeled A, B, C, D.\n\nAvoid ambiguous or misleading wording.\n\nAvoid duplicate or nearly identical questions.\n\nHave plausible incorrect options.\n\nUse clear and grammatically correct language.\n\nVary the difficulty across the 10 questions.\n\nDifficulty\nAim for a balanced distribution:\n\n3 easy questions\n\n4 medium questions\n\n3 difficult questions\n\nThe difficulty should be appropriate to the complexity of the topic."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -272,
+        112
+      ],
+      "id": "aaaa71d1-93f1-48e3-aefb-02d9d6fb7b2e",
+      "name": "Q/A Generator"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "dd66444b-b190-4363-8966-b9070e45280c",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/1TcUEwiNXhS-82D3pZrJjYaTxmzdfl6CZ3rTTyGjNSFc/edit?pli=1&tab=t.0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.text }} "
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        432,
+        -96
+      ],
+      "id": "489a69aa-8a3e-44e3-b90f-0fff2237a13e",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "Z6SY9RHqnDYywVdg",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Notes Generator": [
+      {
+        "json": {
+          "text": "# Gradient Descent in Machine Learning\n\n## Introduction\nGradient Descent is a fundamental optimization algorithm used to minimize the cost function in machine learning and deep learning models. It iteratively adjusts the parameters of a model to find the values that minimize a given function.\n\n### Key Concepts\n- **Objective Function**: The function we aim to minimize (e.g., the cost function).\n- **Parameters**: The coefficients or weights that are adjusted during optimization.\n- **Learning Rate (\\(\\alpha\\))**: A hyperparameter that determines the step size at each iteration.\n\n## Types of Gradient Descent\n\n### 1. Batch Gradient Descent\n- Updates weights after computing the gradient of the entire dataset.\n- **Pros**: Stable convergence.\n- **Cons**: Computationally expensive for large datasets.\n\n### 2. Stochastic Gradient Descent (SGD)\n- Updates weights after computing the gradient of a single sample.\n- **Pros**: Faster computations, can escape local minima due to noise.\n- **Cons**: More noisy, potentially less stable convergence.\n\n### 3. Mini-batch Gradient Descent\n- Compromise between Batch and SGD; updates weights after computing the gradient of a subset of the data.\n- **Pros**: More computationally efficient than batch, more stable than SGD.\n\n## Mathematical Foundation\n\n### Derivation\n- **Step 1**: Initialize parameters \\(\\theta\\_0, \\theta\\_1, \\ldots\\).\n- **Step 2**: Compute the gradient \\(\\nabla J(\\theta)\\) of the cost function \\(J(\\theta)\\).\n- **Step 3**: Update parameters:\n  \\[\n  \\theta = \\theta - \\alpha \\cdot \\nabla J(\\theta)\n  \\]\n\n### Example\n- **Cost Function**: \\(J(\\theta) = \\frac{1}{2m} \\sum (h_\\theta(x^{(i)}) - y^{(i)})^2\\)\n- **Gradient**: \\(\\frac{\\partial}{\\partial \\theta} J(\\theta)\\)\n\n## Learning Rate\n- **Small Learning Rate**: Slow convergence.\n- **Large Learning Rate**: May overshoot the minimum or diverge.\n- **Adaptive Learning Rates**:\n  - Algorithms like Adam, RMSprop adjust learning rates automatically.\n\n## Convergence\n- **Convergence Criteria**: \n  - Absolute change in function value is below a threshold.\n  - Maximum number of iterations reached.\n  \n### Problems to Avoid\n- **Local Minima**: Points that are lower than their neighbors but not the lowest possible point.\n- **Saddle Points**: Flat regions where Local gradient is zero but not a minima or maxima.\n\n## Practical Considerations\n\n### Feature Scaling\n- Normalizing inputs can help gradient descent converge faster.\n\n### Initialization\n- Appropriate initialization of parameters can reduce the time to converge.\n\n### Regularization\n- Techniques like L1 and L2 regularization help prevent overfitting.\n\n## Applications\n\n### Linear Regression\n- Gradient Descent is used to find the linear model that best fits the data.\n\n### Neural Networks\n- Used extensively in training deep learning models to optimize weights.\n\n## Summary\nGradient Descent is an essential tool in machine learning, offering various algorithms tailored to specific situations, balancing speed, and stability. Understanding and selecting the right type of gradient descent, learning rate, and practical considerations can significantly affect model performance and convergence efficiency.\n\nExploring different scenarios and parameters through experimentation can provide insights into the most suitable approach for specific tasks."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Q/A Generator": [
+      {
+        "json": {
+          "text": "### Easy Questions\n\n1. What is the primary objective of gradient descent in machine learning?\n   - A) To solve differential equations\n   - B) To minimize a cost function\n   - C) To convert data to binary format\n   - D) To increase model complexity\n   - **Correct Answer: B) To minimize a cost function**\n\n2. In gradient descent, what does the term \"learning rate\" refer to?\n   - A) The size of each step taken towards a minimum\n   - B) The number of iterations required\n   - C) The amount of data processed per second\n   - D) The accuracy of the model\n   - **Correct Answer: A) The size of each step taken towards a minimum**\n\n3. Which of the following is NOT a variant of gradient descent?\n   - A) Stochastic gradient descent\n   - B) Mini-batch gradient descent\n   - C) Bayesian gradient descent\n   - D) Batch gradient descent\n   - **Correct Answer: C) Bayesian gradient descent**\n\n### Medium Questions\n\n4. What role does the gradient play in gradient descent?\n   - A) It indicates the weight of connections in a neural network.\n   - B) It represents a map of decision boundaries.\n   - C) It points in the direction of the steepest increase.\n   - D) It indicates the direction to update parameters to minimize the cost function.\n   - **Correct Answer: D) It indicates the direction to update parameters to minimize the cost function.**\n\n5. Why might one use batch gradient descent over stochastic gradient descent?\n   - A) It requires less memory.\n   - B) It is less computationally intensive.\n   - C) It is more stable and less noisy.\n   - D) It converges more quickly on large datasets.\n   - **Correct Answer: C) It is more stable and less noisy.**\n\n6. Which factor can lead to gradient descent failing to converge?\n   - A) A high number of features \n   - B) A very high learning rate\n   - C) A large dataset size\n   - D) Proper scaling of features\n   - **Correct Answer: B) A very high learning rate**\n\n7. What problem does mini-batch gradient descent aim to solve?\n   - A) Limited dataset size\n   - B) Overfitting of the model\n   - C) Slow convergence of standard gradient descent\n   - D) Variance noise of stochastic gradient descent\n   - **Correct Answer: D) Variance noise of stochastic gradient descent**\n\n### Difficult Questions\n\n8. In the context of deep learning, why might one use a technique such as momentum with gradient descent?\n   - A) To simplify the computation of derivatives\n   - B) To avoid convergence\n   - C) To accelerate convergence by considering past gradients\n   - D) To increase the learning rate dynamically\n   - **Correct Answer: C) To accelerate convergence by considering past gradients**\n\n9. Which of the following is true about the behavior of gradient descent on a non-convex cost function?\n   - A) It will always find the global minimum.\n   - B) It may converge to a local minimum or saddle point.\n   - C) It will diverge unless the cost function is linear.\n   - D) It only works with binary classification problems.\n   - **Correct Answer: B) It may converge to a local minimum or saddle point.**\n\n10. When using adaptive gradient descent methods like Adam, how are the learning rates adjusted?\n    - A) Based on the number of epochs completed\n    - B) By decreasing linearly over time\n    - C) By using estimates of first and second moments of the gradients\n    - D) By fixing them at the start of training\n    - **Correct Answer: C) By using estimates of first and second moments of the gradients**"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Topic Selection": [
+      {
+        "json": {
+          "Enter the Topic name want to revise/explore.": "Gradient Descent in Machine Learning",
+          "submittedAt": "2026-09-15T16:52:31.169+05:30",
+          "formMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Merge": [
+      {
+        "json": {
+          "text": "# Gradient Descent in Machine Learning\n\n## Introduction\nGradient Descent is a fundamental optimization algorithm used to minimize the cost function in machine learning and deep learning models. It iteratively adjusts the parameters of a model to find the values that minimize a given function.\n\n### Key Concepts\n- **Objective Function**: The function we aim to minimize (e.g., the cost function).\n- **Parameters**: The coefficients or weights that are adjusted during optimization.\n- **Learning Rate (\\(\\alpha\\))**: A hyperparameter that determines the step size at each iteration.\n\n## Types of Gradient Descent\n\n### 1. Batch Gradient Descent\n- Updates weights after computing the gradient of the entire dataset.\n- **Pros**: Stable convergence.\n- **Cons**: Computationally expensive for large datasets.\n\n### 2. Stochastic Gradient Descent (SGD)\n- Updates weights after computing the gradient of a single sample.\n- **Pros**: Faster computations, can escape local minima due to noise.\n- **Cons**: More noisy, potentially less stable convergence.\n\n### 3. Mini-batch Gradient Descent\n- Compromise between Batch and SGD; updates weights after computing the gradient of a subset of the data.\n- **Pros**: More computationally efficient than batch, more stable than SGD.\n\n## Mathematical Foundation\n\n### Derivation\n- **Step 1**: Initialize parameters \\(\\theta\\_0, \\theta\\_1, \\ldots\\).\n- **Step 2**: Compute the gradient \\(\\nabla J(\\theta)\\) of the cost function \\(J(\\theta)\\).\n- **Step 3**: Update parameters:\n  \\[\n  \\theta = \\theta - \\alpha \\cdot \\nabla J(\\theta)\n  \\]\n\n### Example\n- **Cost Function**: \\(J(\\theta) = \\frac{1}{2m} \\sum (h_\\theta(x^{(i)}) - y^{(i)})^2\\)\n- **Gradient**: \\(\\frac{\\partial}{\\partial \\theta} J(\\theta)\\)\n\n## Learning Rate\n- **Small Learning Rate**: Slow convergence.\n- **Large Learning Rate**: May overshoot the minimum or diverge.\n- **Adaptive Learning Rates**:\n  - Algorithms like Adam, RMSprop adjust learning rates automatically.\n\n## Convergence\n- **Convergence Criteria**: \n  - Absolute change in function value is below a threshold.\n  - Maximum number of iterations reached.\n  \n### Problems to Avoid\n- **Local Minima**: Points that are lower than their neighbors but not the lowest possible point.\n- **Saddle Points**: Flat regions where Local gradient is zero but not a minima or maxima.\n\n## Practical Considerations\n\n### Feature Scaling\n- Normalizing inputs can help gradient descent converge faster.\n\n### Initialization\n- Appropriate initialization of parameters can reduce the time to converge.\n\n### Regularization\n- Techniques like L1 and L2 regularization help prevent overfitting.\n\n## Applications\n\n### Linear Regression\n- Gradient Descent is used to find the linear model that best fits the data.\n\n### Neural Networks\n- Used extensively in training deep learning models to optimize weights.\n\n## Summary\nGradient Descent is an essential tool in machine learning, offering various algorithms tailored to specific situations, balancing speed, and stability. Understanding and selecting the right type of gradient descent, learning rate, and practical considerations can significantly affect model performance and convergence efficiency.\n\nExploring different scenarios and parameters through experimentation can provide insights into the most suitable approach for specific tasks."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "text": "### Easy Questions\n\n1. What is the primary objective of gradient descent in machine learning?\n   - A) To solve differential equations\n   - B) To minimize a cost function\n   - C) To convert data to binary format\n   - D) To increase model complexity\n   - **Correct Answer: B) To minimize a cost function**\n\n2. In gradient descent, what does the term \"learning rate\" refer to?\n   - A) The size of each step taken towards a minimum\n   - B) The number of iterations required\n   - C) The amount of data processed per second\n   - D) The accuracy of the model\n   - **Correct Answer: A) The size of each step taken towards a minimum**\n\n3. Which of the following is NOT a variant of gradient descent?\n   - A) Stochastic gradient descent\n   - B) Mini-batch gradient descent\n   - C) Bayesian gradient descent\n   - D) Batch gradient descent\n   - **Correct Answer: C) Bayesian gradient descent**\n\n### Medium Questions\n\n4. What role does the gradient play in gradient descent?\n   - A) It indicates the weight of connections in a neural network.\n   - B) It represents a map of decision boundaries.\n   - C) It points in the direction of the steepest increase.\n   - D) It indicates the direction to update parameters to minimize the cost function.\n   - **Correct Answer: D) It indicates the direction to update parameters to minimize the cost function.**\n\n5. Why might one use batch gradient descent over stochastic gradient descent?\n   - A) It requires less memory.\n   - B) It is less computationally intensive.\n   - C) It is more stable and less noisy.\n   - D) It converges more quickly on large datasets.\n   - **Correct Answer: C) It is more stable and less noisy.**\n\n6. Which factor can lead to gradient descent failing to converge?\n   - A) A high number of features \n   - B) A very high learning rate\n   - C) A large dataset size\n   - D) Proper scaling of features\n   - **Correct Answer: B) A very high learning rate**\n\n7. What problem does mini-batch gradient descent aim to solve?\n   - A) Limited dataset size\n   - B) Overfitting of the model\n   - C) Slow convergence of standard gradient descent\n   - D) Variance noise of stochastic gradient descent\n   - **Correct Answer: D) Variance noise of stochastic gradient descent**\n\n### Difficult Questions\n\n8. In the context of deep learning, why might one use a technique such as momentum with gradient descent?\n   - A) To simplify the computation of derivatives\n   - B) To avoid convergence\n   - C) To accelerate convergence by considering past gradients\n   - D) To increase the learning rate dynamically\n   - **Correct Answer: C) To accelerate convergence by considering past gradients**\n\n9. Which of the following is true about the behavior of gradient descent on a non-convex cost function?\n   - A) It will always find the global minimum.\n   - B) It may converge to a local minimum or saddle point.\n   - C) It will diverge unless the cost function is linear.\n   - D) It only works with binary classification problems.\n   - **Correct Answer: B) It may converge to a local minimum or saddle point.**\n\n10. When using adaptive gradient descent methods like Adam, how are the learning rates adjusted?\n    - A) Based on the number of epochs completed\n    - B) By decreasing linearly over time\n    - C) By using estimates of first and second moments of the gradients\n    - D) By fixing them at the start of training\n    - **Correct Answer: C) By using estimates of first and second moments of the gradients**"
+        },
+        "pairedItem": {
+          "item": 0,
+          "input": 1
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Topic Selection": {
+      "main": [
+        [
+          {
+            "node": "Notes Generator",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Q/A Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Notes Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Q/A Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Q/A Generator": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Notes Generator": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "20aed005-26e1-47e9-8cce-0883f389f428",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "87f784702f4274bd6b57595279a4bda0fe4acf163da8d01ce99d1f90ce125e83"
+  },
+  "nodeGroups": [],
+  "id": "PLXARyy8gEU5dcWM",
+  "tags": []
+}
