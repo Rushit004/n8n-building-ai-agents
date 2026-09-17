@@ -24,9 +24,15 @@ A first hands-on n8n workflow that takes any topic name from a user and automati
 
 **Flow shape:** Topic Selection branches into two parallel LLM chains (Notes + Q/A), which recombine at Merge before being written to Google Docs — a clean example of the parallel-workflow pattern that comes up later in the course.
 
+## 🖼️ Preview
+
+Architecture of the workflow as built in n8n:
+
+![n8n workflow architecture](./screenshot.png)
+
 ## 🗂️ Files
 - `workflow.json` — full exported workflow, importable via **n8n → Workflows → Import from File**
-- `screenshot.png` — *(add canvas + execution screenshot before the trial ends)*
+- `screenshot.png` — canvas screenshot showing the full node layout and connections
 
 ## 🐛 What Broke / Lessons
 - Each LangChain LLM Chain node needs its **own** attached Chat Model node — reusing one OpenAI Chat Model node for both chains isn't how it's wired here; that's why there are two nearly identical model nodes (`OpenAI Chat Model` and `OpenAI Chat Model1`) instead of one shared one.
