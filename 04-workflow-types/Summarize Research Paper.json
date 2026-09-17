@@ -1,0 +1,357 @@
+{
+  "name": "Summarize Research Paper",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "File Form ",
+        "formDescription": "upload an single pdf Research file and get summary and key derivations or codes  ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Enter file ",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -416,
+        -96
+      ],
+      "id": "d6b29fc2-2e3b-4071-8fac-7b94c62b349d",
+      "name": "On form submission",
+      "webhookId": "6f98ee98-db0c-466a-9bc8-1a3b87e31886"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Enter_file_",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        -96
+      ],
+      "id": "5e289870-a298-4cd6-b727-5bb3a1670dee",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Summarize the following research paper using the required structure.\n\nPlease focus on:\n\nThe research problem and objective\n\nThe methodology and approach\n\nDataset/sample and techniques used\n\nKey results and important numerical findings\n\nMain conclusions\n\nLimitations mentioned by the authors\n\nFuture research directions\n\nThe 3–5 most important takeaways\n\nKeep the summary accurate, concise, objective, and easy to understand. Do not add information that is not present in the paper. If something is not provided, state \"Not specified in the provided text.\"\n\nResearch Paper\n\n {{ $json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert research-paper summarization assistant.  Your task is to summarize the provided research paper accurately, clearly, and objectively. The summary should help a reader understand the paper without needing to read the entire document.  Core Instructions  Read and understand the entire provided text before summarizing.  Identify the paper's main research problem, objectives, methodology, findings, and conclusions.  Preserve the original meaning and context of the research.  Do not introduce information, facts, results, citations, or interpretations that are not present in the provided paper.  Do not fabricate missing information.  Clearly distinguish between the authors' findings, interpretations, limitations, and proposed future work.  Retain important technical terminology, variables, metrics, datasets, models, and statistical results when they are relevant.  Explain complex technical concepts in simple language without changing their meaning.  Remove unnecessary repetition, background details, and minor information.  Do not criticize or evaluate the quality of the research unless explicitly requested.  If information is missing from the paper, state \"Not specified in the provided text\" rather than guessing.  If the text contains conflicting or unclear information, mention the ambiguity rather than resolving it through assumptions.  Required Output Structure  1. Paper Overview  Title:  Authors:  Research area:  Main topic:  2. Research Problem  What problem does the paper address?  Why is the problem important according to the authors?  3. Research Objective  What does the study aim to investigate, develop, compare, or demonstrate?  4. Methodology  Research approach:  Dataset/sample:  Tools, models, or techniques used:  Experimental or analytical procedure:  5. Key Findings  Summarize the most important results.  Include significant numbers, metrics, comparisons, or statistical findings when available.  6. Main Conclusion  What conclusions do the authors draw from their results?  7. Limitations  List limitations explicitly mentioned by the authors.  Do not create additional limitations unless requested.  8. Future Work  Summarize future research directions proposed by the authors.  9. Key Takeaways  Provide 3–5 concise points capturing the most important information from the paper.  Summary Style  Use clear headings and bullet points.  Use concise, professional, academic language.  Prioritize important information over minor details.  Avoid unnecessary repetition.  Make the summary understandable to a reader who is familiar with the general research area but has not read the paper.  For a highly technical paper, retain the necessary technical details rather than oversimplifying them. "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        32,
+        -240
+      ],
+      "id": "dbdf70f7-2a23-4f63-a281-22205d7aa8e3",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        -64
+      ],
+      "id": "9b0440c3-4fc0-420a-ad23-6b04fc5df132",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following research paper, technical document, or source code and extract the most important mathematical derivations, equations, algorithms, and code.\n\nPlease focus on:\n\nImportant assumptions and definitions\n\nKey equations and what each equation represents\n\nStep-by-step derivations of the major equations\n\nImportant algorithms and their purpose\n\nImportant code snippets and what they implement\n\nImportant parameters, variables, inputs, and outputs\n\nHow the mathematical equations are connected to the implementation\n\nImportant results produced by the equations or code\n\nThe most important technical takeaways\n\nFor mathematical derivations, show the starting equation → key steps → final equation and briefly explain each step.\n\nFor code, include only the important/relevant portions, not large repetitive blocks. Explain how the code relates to the mathematical or algorithmic approach.\n\nDo not invent missing derivation steps, equations, variables, or code behavior. If something is not provided, clearly state \"Not specified in the provided text.\"\n\nUse LaTeX for equations, Markdown headings, numbered derivation steps, bullet points, and code blocks where appropriate.\n\nContent to Analyze\n {{ $json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert technical summarization assistant specializing in mathematical derivations, algorithms, equations, and source code.  Your task is to identify and summarize the important mathematical derivations, equations, algorithms, and code from the provided technical text, research paper, documentation, or source code.  Core Instructions Read and understand the provided content before summarizing.  Identify only the derivations, equations, algorithms, formulas, and code that are important for understanding the work.  Preserve the original mathematical meaning and logic.  Do not invent equations, variables, assumptions, code, results, or implementation details.  Keep the original variable names, function names, model names, and terminology whenever possible.  Explain what each important equation or code section does and why it is used.  For mathematical derivations, show the important steps rather than only providing the final equation.  Do not reproduce long blocks of code unnecessarily.  Extract only the most relevant code snippets or provide concise pseudocode when the complete code is not necessary.  Explain dependencies between equations, algorithms, and code when they exist.  Clearly distinguish between:  Given equations/formulas  Derived equations  Algorithms  Implementation/code  Results produced by the code  If a derivation skips intermediate steps in the source, do not invent them. State that intermediate steps were not provided.  If code is incomplete or depends on external files/functions, explicitly mention this.  Preserve important parameters, hyperparameters, inputs, outputs, and assumptions.  If the provided content contains errors or inconsistencies, point them out descriptively without silently correcting them.  "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        32,
+        96
+      ],
+      "id": "c3c9ae2b-510c-44eb-8b3f-f5fbf1773b18",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-5",
+          "cachedResultName": "Claude Sonnet 5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.6,
+      "position": [
+        -16,
+        288
+      ],
+      "id": "d1a8d6bf-6c6f-4837-835c-1fcc6a357c9f",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        464,
+        -112
+      ],
+      "id": "541691b0-d4ef-484e-aaf3-12545ee04994",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/1Cl-YT2qiehpDMjiTkxjRZ2Q-A9Nb8LGUvAYHqbJdqYY/edit?tab=t.0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -112
+      ],
+      "id": "8c86598b-6735-43e2-b9bd-07a3907e8780",
+      "name": "Update a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "Z6SY9RHqnDYywVdg",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Extract from File": [
+      {
+        "json": {
+          "numpages": 28,
+          "numrender": 28,
+          "info": {
+            "PDFFormatVersion": "1.5",
+            "Language": null,
+            "EncryptFilterName": null,
+            "IsLinearized": false,
+            "IsAcroFormPresent": false,
+            "IsXFAPresent": false,
+            "IsCollectionPresent": false,
+            "IsSignaturesPresent": false,
+            "Author": "Piyush Rai",
+            "Title": " Bias/Variance Trade-off, Some Practical Issues,   Semi-supervised and Active Learning",
+            "Subject": "",
+            "Creator": "LaTeX with Beamer class version 3.36",
+            "Producer": "pdfTeX-1.40.17",
+            "Keywords": "",
+            "CreationDate": "D:20181113171629+05'30'",
+            "ModDate": "D:20181113171629+05'30'",
+            "Trapped": {
+              "name": "False"
+            },
+            "Custom": {
+              "PTEX.Fullbanner": "This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016/Debian) kpathsea version 6.2.2"
+            }
+          },
+          "text": "Bias/Variance Trade-off, Some Practical Issues,\nSemi-supervised and Active Learning\nPiyush Rai\nIntroduction to Machine Learning (CS771A)\nNovember 13, 2018\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 1\n\nPlan for today\nBias/Variance Trade-off of Learning Algorithms\nSome basic guidelines for debugging ML algorithms\nWhat if training data and test data distributions are NOT the same\nHow to utilize unlabeled data: Semi-supervised Learning\nHow to selectively ask for the most informative data: Active Learning\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 2\n\nBias/Variance Trade-off\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 3\n\nA Fundamental Decomposition\nAssume F to be a class of models (e.g., set of linear classifiers with some pre-defined features)\nSuppose we’ve learned a model f ∈ F learned using some (finite amount of) training data\nCan decompose the test error \u000f(f ) of f as follows\n\u000f(f ) =\n[\nmin\nf \n∗\n∈F \n\u000f(f \n∗\n)\n]\n︸ \n︷︷ ︸\napproximation error\n+\n[\n\u000f(f ) − min\nf \n∗\n∈F \n\u000f(f \n∗\n)\n]\n︸ \n︷︷ ︸\nestimation error\nHere f \n∗ \nis the best possible model in F assuming infinite amount of training data\nApproximation error: Error of best model f \n∗ \nbecause of the model class F being too simple\nEstimation error: Error of learned model f (relative to f \n∗\n) because we only had finite training data\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 4\n\nA Trade-off\nThere is a trade-off between the two components of the error\n\u000f(f ) =\n[\nmin\nf \n∗\n∈F \n\u000f(f \n∗\n)\n]\n︸ ︷︷ ︸\napproximation error\n+\n[\n\u000f(f ) − min\nf \n∗\n∈F \n\u000f(f \n∗\n)\n]\n︸ ︷︷ ︸\nestimation error\nCan reduce the approximation error by making F more complex/richer, e.g.,\nReplace the linear classifiers by a higher order polynomials\nAdd more features in the data\nHowever, making F richer will usually cause estimation error to increase since f can now overfit\nf may give small error on some datasets, large error on some datasets\nNote: The above trade-off is popularly known as the bias/variance trade-off\nApproximation error known as “bias”(high if the model is simple)\nEstimation error known as “variance”(high if the model is complex)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 5\n\nA Visual Illustration of the Trade-off\nModel Complexity\nBiasVariance\nTest Error\nSmall Medium High\nUnderfitting Overfitting\nTraining\nError\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 6\n\nDebugging ML Algorithms\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 7\n\nDebugging Learning Algorithms\nA notoriously hard problem in general\nNote that code for ML algorithms is not procedural but data-driven\nWhat to do when our model (say logistic regression) isn’t doing well on test data\nUse more training examples to train the model?\nUse a smaller number of features?\nIntroduce new features (can be combinations of existing features)?\nTry tuning the regularization parameter?\nRun (the iterative) optimizer longer, i.e., for more iterations?\nChange the optimization algorithm (e.g., GD to SGD or Newton..)?\nGive up and switch to a different model (e.g., SVM)?\nHow to know what might be going wrong and how to debug?\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 8\n\nHigh Bias or High Variance?\nThe bad performance (low accuracy on test data) could be due either\nHigh Bias (Underfitting)\nHigh Variance (Overfitting)\nLooking at the training and test error can tell which of the two is the case\nModel Complexity\nBiasVariance\nTest Error\nSmall Medium High\nUnderfitting Overfitting\nTraining\nError\nHigh Bias: Both training and test errors are large\nHigh Variance: Small training error, large test error (and huge gap)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 9\n\nSome Guidelines for Debugging Learning Algorithms\nModel Complexity\nBiasVariance\nTest Error\nSmall Medium High\nUnderfitting Overfitting\nTraining\nError\nIf the model has high bias (underfitting) then the model class is weak\nAdding more training data won’t help\nInstead, try making the model class richer, or add more features (makes the model richer)\nIf the model has high variance (overfitting) then the model class is sufficiently rich\nAdding more training data can help (overfitting might be due to limited training data)\nUsing a simpler model class or fewer features or regularization can help\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 10\n\nWhen Train and Test Distributions Differ\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 11\n\nWhen Train and Test Conditions are Different..\nTraining and test inputs typically assumed to be drawn from same distribution, i.e., p\ntr \n(x) = p\nte \n(x)\nHowever, this is rarely true in real-world applications of ML where p\ntr \n(x) 6 = p\nte \n(x)\nSo the training and test data are from different “domains”. How can we “adapt”?\nKnown as “domain adaptation” (also “covariate-shift”, since features x are also called covariates)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 12\n\nHandling Domain Differences: Some Approaches\nLearning a transformation that makes the training and test data distributions “close”\nUse an “importance weighted” correction of the loss function defined on the training data\nN\n∑\nn=1\np\nte \n(x\nn\n)\np\ntr \n(x\nn\n) \n`(y\nn\n, f (x\nn\n))\n.. basically, assign a weight to each term of the loss function, depending on how “close” the training\nexample (x\nn\n, y\nn\n) is from the test distribution\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 13\n\nImportance-Weighted Correction: A Closer Look\nNote that, since we care about test data, ideally, we would like to learn f by minimizing\nE\np\nte \n(x)\n[`(y , f (x))] =\n∫\np\nte \n(x)`(y , f (x))dx\nHowever, we don’t have labeled data from the test domain. :-( \nWhat can we do now?\nLet’s re-express the above in terms of the loss on training data\n∫\np\nte \n(x)`(y , f (x))dx \n=\n∫\np\ntr \n(x) \np\nte \n(x)\np\ntr \n(x) \n`(y , f (x))dx\n= E\np\ntr \n(x)\n[ \np\nte \n(x)\np\ntr \n(x) \n`(y , f (x))\n]\n≈\nN\n∑\nn=1\np\nte \n(x\nn\n)\np\ntr \n(x\nn\n) \n`(y\nn\n, f (x\nn\n)) (uses only training data from p\ntr \n)\nIn order to do this, we need to estimate the two densities p\ntr \n(x) and p\nte \n(x) (can assume some form\nfor these and estimate them using unlabeled data from both domains)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 14\n\nSemi-supervised Learning\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 15\n\nLabeled vs Unlabeled Data\nSupervised Learning models require labeled data\nLearning a reliable model usually requires plenty of labeled data\nLabeled Data: Expensive and Scarce (someone has to do the labeling)\nOften labeling is very difficult too (e.g., in speech analysis or NLP problems)\nUnlabeled Data: Abundant and Free/Cheap\nE.g., can easily crawl the web and download webpages/images\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 16\n\nLearning with Labeled+Unlabeled Data\nUsually such problems come in one of the following two flavors\nSemi-supervised Learning\nTraining set containslabeled data L = {x\ni \n, y\ni \n}\nL\ni=1 \nand unlabeled data U = {x\nj \n}\nL+U\nj=L+1 \n(usually U \u001d L)\nNote: In some cases, U is also our test data (this is called transductive setting)\nInductive setting is more standard: Want to learn a classifier for future test data\nSemi-Unsupervised Learning\nWe are given unlabeled data D = {x\ni \n}\nN\ni=1\nAdditionally, we’re given supervision in form of some constraints on data (e.g., points x\nn \nand x\nm\nbelong to the same cluster) or “labels” of some points.\nWant to learn an unsupervised learning model combining both data sources\nHere, we will focus on Semi-supervised Learning (SSL)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 17\n\nWhy/How Might Unlabeled Data Help?\nRed: + 1, Dark Blue: -1\nLet’s include some additional unlabeled points (Light Blue points)\nAssumption: Examples from the same class are clustered together\nAssumption: Decision boundary lies in the region where data has low density\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 18\n\nWhy/How Might Unlabeled Data Help?\nKnowledge of the input distribution helps even if the data is unlabeled\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 19\n\nSome Basic Assumptions used in SSL\nNearby points (may) have the same label\nSmoothness assumption\nPoints in the same cluster (may) have same label\nCluster assumption\nDecision boundary lies in areas where data has low density\nLow-density separation\nNote: Generative models already take some of these assumptions into account (recall HW3\nproblem on semi-supervised learning using EM)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 20\n\nSSL using Graph-based Regularization\nBased on smoothness assumption\nRequires constructing a graph between all the examples (labeled/unlabeled)\nThe graph can be constructed using several ways\nConnecting every example with its top k neighbors (labeled/unlabeled)\nConstructing an all-connected weighted graph\nWeighted case: weight of edge connecting examples x\ni \nand x\nj\na\nij \n= exp(−||x\ni \n− x\nj \n||\n2\n/σ\n2\n)\n.. where A is the (L + U) × (L + U) matrix of pairwise similarities\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 21\n\nSSL using Graph-based Regularization\nSuppose we want to learn a function f using labeled+unlabeld data \nL ∪ U\nSuppose f\ni \ndenotes the prediction on example x\ni\nSimilar examples x\ni \nand x\nj \n(thus high a\nij \n) should have similar f\ni \nand f\nj\nGraph-based regularization optimizes the following objective:\nmin\nf\n∑\ni∈L\n`(y\ni \n, f\ni \n)\n︸ ︷︷ ︸\nloss term\n+ λR(f )\n︸ ︷︷ ︸\nusual regularizer\n+ γ \n∑\ni,j∈L,U\na\nij \n(f\ni \n− f\nj \n)\n2\n︸ \n︷︷ ︸\ngraph-based regularizer\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 22\n\nSSL using EM based Generative Classification\nSuppose data D is labeled L = {x\ni \n, y\ni \n}\nL\ni=1 \nand unlabeled U = {x\nj \n}\nL+U\nj=L+1\nAssume the following model\np(D|θ) =\nL\n∏\ni=1\np(x\ni \n, y\ni \n|θ)\n︸ ︷︷ ︸\nlabeled\nL+U\n∏\nj=L+1\np(x\nj \n|θ)\n︸ \n︷︷ ︸\nunlabeled\n=\nL\n∏\ni=1\np(x\ni \n, y\ni \n|θ)\nL+U\n∏\nj=L+1\n∑\ny\nj\np(x\nj \n, y\nj \n|θ)\nThe unknowns are {y\nj \n}\nL+U\nj=L+1 \n(latent variables) and θ (parameters)\nWe can use EM to estimate the unknowns\nGiven θ = \nˆ\nθ, E step will compute expected labels for unlabeled examples\nE[y\nj \n] = +1 × P(y\nj \n= +1|\nˆ\nθ, x\nj \n) + (−1) × P(y\nj \n= −1|\nˆ\nθ, x\nj \n)\nM step can then perform standard MLE for re-estimating the parameters θ\nA fairly general framework for semi-supervised learning. Can be used for different types of data (by\nchoosing the appropriate p(x|y ) distribution)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 23\n\nThings can go wrong..\nIf assumptions are not appropriate for the data (e.g., incorrectly specified class conditional distributions)\nThus need to be careful/flexible about the choice of class conditional distributions\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 24\n\nActive Learning\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 25\n\nPassive vs Active Learning\nStandard supervised learning assumes a “passive” learner\nCalled “passive” because the learner doesn’t have any control over the labeled data it gets to learn\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 26\n\nActive Learning\nAn “active” learner can specifically request labels of “hard” examples that are most useful for learning\nHow to quantify the “hardness” or “usefulness” of an unlabeled example?\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 27\n\nActive Learning\nVarious ways to define the usefulness/hardness of an unlabeled example x\nA probabilistic approach can use distribution of y given x to quantify usefulness of x\n, e.g.,\nIn classification, can look at the entropy of the distribution p(y |x, w ) or posterior predictive p(y |x)\n.. and choose example(s) for which the distribution of y given x has the largest entropy\nLook at the variance of the posterior predictive p(y |x). E.g. for regression,\n.. and choose choose example(s) for which variance of posterior predictive is the largest\n.. many other ways to utilize the information in p(y |x)\nIntro to Machine Learning (CS771A) Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning 28",
+          "version": "5.4.296"
+        },
+        "binary": {},
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Basic LLM Chain": [
+      {
+        "json": {
+          "text": "1. Paper Overview\n- Title: Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning\n- Authors: Piyush Rai\n- Research area: Machine Learning (introductory/educational)\n- Main topic: Conceptual overview of bias–variance trade-off, practical debugging guidelines, domain adaptation (when train/test distributions differ), semi‑supervised learning (SSL) techniques, and active learning strategies.\n\n2. Research Problem\n- What problem does the paper address?\n  - Explains fundamental problems and practical issues in supervised learning: the bias–variance decomposition and trade-off, how to debug poor model performance, how to handle differing train and test distributions (domain adaptation / covariate shift), how to exploit abundant unlabeled data (semi‑supervised learning), and how to selectively acquire labels efficiently (active learning).\n- Why is the problem important according to the authors?\n  - Real-world ML faces limits from finite data, model misspecification, mismatched training/test domains, and the expense/scarcity of labeled data. Understanding these issues and methods to mitigate them is critical for building reliable models.\n\n3. Research Objective\n- Aim: To present and explain key conceptual frameworks and practical approaches for:\n  - Understanding and managing the bias–variance trade-off.\n  - Diagnosing whether poor performance arises from high bias or high variance and recommending remedies.\n  - Addressing domain differences between training and test data.\n  - Leveraging unlabeled data via semi‑supervised learning (graph regularization, EM-based generative SSL).\n  - Designing active learning queries that request the most informative labels.\n\n4. Methodology\n- Research approach:\n  - Didactic survey/lecture summarizing theoretical decompositions, assumptions, and standard algorithmic approaches (no empirical experiments reported).\n- Dataset/sample:\n  - Not specified in the provided text (the material is conceptual; no datasets or empirical benchmarks are given).\n- Tools, models, or techniques used:\n  - Bias–variance decomposition (approximation error vs. estimation error).\n  - Regularization, model complexity control (e.g., linear vs. polynomial models).\n  - Importance-weighted loss for domain adaptation: weight each training loss term by p_te(x)/p_tr(x).\n  - Graph-based semi‑supervised regularization: build similarity graph (k‑NN or fully connected weighted graph with weights a_ij = exp(−||x_i − x_j||^2/σ^2)) and add graph smoothness penalty ∑_{i,j} a_ij (f_i − f_j)^2.\n  - EM-based generative semi‑supervised learning: maximize joint likelihood p(D|θ) with latent labels for unlabeled data; use E-step to compute expected labels and M-step to reestimate θ.\n  - Active learning selection criteria: entropy of p(y|x), variance of posterior predictive, and other uncertainty-based measures.\n  - Standard supervised models are referenced (logistic regression, SVM) as examples when discussing debugging.\n- Experimental or analytical procedure:\n  - Not applicable / Not specified — the document outlines methods and formulas but does not describe experiments or empirical evaluation.\n\n5. Key Findings\n(Since this is an instructional/survey-style document, “findings” are conceptual takeaways rather than empirical results.)\n- Bias–variance decomposition:\n  - Test error can be decomposed into approximation error (min_{f*∈F} error(f*)) and estimation error (error(f) − min_{f*∈F} error(f*)). Making the model class F richer reduces approximation error but tends to increase estimation error (bias–variance trade-off).\n- Debugging guidelines:\n  - Distinguish high bias (both training and test errors large) from high variance (low training error, large test error).\n  - Remedies: For high bias → increase model complexity / add features; for high variance → add more training data, simplify model, reduce features, or increase regularization.\n- Domain adaptation (train/test distributions differ):\n  - Reweight training losses by importance weights p_te(x)/p_tr(x) to approximate minimizing expected test loss: E_{p_te}[ℓ(y,f(x))] ≈ ∑_n (p_te(x_n)/p_tr(x_n)) ℓ(y_n, f(x_n)); requires estimating the two densities (can use unlabeled data).\n- Semi‑supervised learning:\n  - Unlabeled data can help under assumptions: smoothness (nearby points share labels), cluster assumption (points in same cluster share labels), or low-density separation (decision boundary lies in low-density regions).\n  - Graph-based SSL objective: minimize ∑_{i∈L} ℓ(y_i, f_i) + λ R(f) + γ ∑_{i,j} a_ij (f_i − f_j)^2.\n  - EM-based generative SSL: treat labels of unlabeled examples as latent, maximize joint likelihood p(D|θ) = ∏_{labeled} p(x_i,y_i|θ) ∏_{unlabeled} ∑_{y} p(x_j,y|θ) via EM.\n  - Caveat: SSL methods can fail if their underlying assumptions (e.g., class-conditional models) are incorrect.\n- Active learning:\n  - Active learners can request labels for the most informative/hard examples.\n  - Use measures derived from predictive distributions—e.g., entropy of p(y|x) for classification or posterior predictive variance for regression—to select queries.\n\n6. Main Conclusion\n- The slides conclude that:\n  - Understanding the bias–variance trade-off and correctly diagnosing whether high bias or high variance causes poor performance is central to choosing remedies.\n  - When training and test distributions differ, importance-weighting or learning transformations to align distributions are viable strategies but require density estimation or unlabeled data from both domains.\n  - Unlabeled data can be valuable under reasonable assumptions; SSL methods (graph-based regularization and EM-based generative approaches) operationalize these assumptions but depend on their validity.\n  - Active learning can reduce labeling cost by querying the most informative examples, using uncertainty-based criteria derived from predictive distributions.\n\n7. Limitations\n- Explicit limitations mentioned by the authors:\n  - Semi‑supervised methods can fail if their assumptions are inappropriate (e.g., incorrectly specified class-conditional distributions in EM-based SSL). Thus, choice of class‑conditional model must be careful/flexible.\n  - For importance-weighted domain adaptation, one must estimate p_tr(x) and p_te(x); errors in these density estimates will affect results.\n- No empirical limitations, benchmarking caveats, or quantitative limitations are provided because the text is a conceptual lecture (experimental details are Not specified in the provided text).\n\n8. Future Work\n- Not specified in the provided text (the slides do not list explicit future research directions; they present standard approaches and practical guidance).\n\n9. Key Takeaways (3–5)\n- 1) The bias–variance trade-off: richer model classes reduce approximation error (bias) but typically increase estimation error (variance); diagnose via training vs. test error and apply appropriate remedies.\n- 2) When training and test distributions differ, reweighting training losses by p_te(x)/p_tr(x) or learning domain-invariant transformations uses unlabeled data to better approximate test loss.\n- 3) Semi‑supervised learning can leverage abundant unlabeled data under assumptions (smoothness, cluster, low-density separation); common methods include graph-based regularization and EM-based generative models, but their success depends on those assumptions and model specification.\n- 4) Active learning reduces labeling effort by querying the most informative examples; uncertainty measures such as predictive entropy or posterior variance are practical selection criteria.\n- 5) Practical ML debugging relies on principled diagnosis (bias vs. variance) and a toolbox of remedies (model complexity, regularization, more data, domain correction, leveraging unlabeled data, or active queries), but each method requires attention to underlying assumptions and data conditions."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Basic LLM Chain1": [
+      {
+        "json": {
+          "text": "# Summary: Bias/Variance Trade-off, Practical ML Issues, Semi-supervised and Active Learning\n\n## 1. Bias/Variance Trade-off\n\n### Key Definitions\n- **Model class $F$**: a hypothesis space (e.g., linear classifiers with fixed features)\n- **$f$**: the model actually learned from a finite training set\n- **$f^* \\in F$**: the best possible model in $F$ under infinite training data\n\n### Core Equation: Error Decomposition\n$$\n\\ell(f) = \\underbrace{\\Big[\\min_{f^*\\in F}\\ell(f^*)\\Big]}_{\\text{approximation error (bias)}} + \\underbrace{\\Big[\\ell(f) - \\min_{f^*\\in F}\\ell(f^*)\\Big]}_{\\text{estimation error (variance)}}\n$$\n\n**Interpretation:**\n- **Approximation error / bias**: error of the *best achievable* model in $F$; large when $F$ is too simple (underfitting).\n- **Estimation error / variance**: extra error incurred by learning $f$ from *finite* data instead of having the ideal $f^*$; large when $F$ is complex enough to overfit.\n\n### Trade-off Logic\n- Increasing model complexity (richer $F$, higher-order features) → **decreases bias**, but\n- **increases variance**, since $f$ becomes more sensitive to the specific training sample and may overfit.\n- This is the classical **bias–variance trade-off**, visualized as a U-shaped test-error curve vs. model complexity, with:\n  - Bias dominating error at low complexity (**underfitting**)\n  - Variance dominating error at high complexity (**overfitting**)\n\n### Diagnostic Rule (from train/test error gap)\n- **High bias**: both training and test error are large (model too weak even on training data).\n- **High variance**: training error is small but test error is large (large train-test gap → overfitting).\n\n### Practical Debugging Guidelines\n| Diagnosis | Recommended Fix |\n|---|---|\n| High Bias (underfitting) | More training data does **not** help; instead increase model richness (add features, use more complex model class) |\n| High Variance (overfitting) | More training data **can** help; alternatively simplify model, reduce features, or increase regularization |\n\n*(No formal derivation of these rules is given beyond the empirical train/test error behavior described.)*\n\n---\n\n## 2. Domain Adaptation (Train/Test Distribution Mismatch)\n\n### Assumption Being Relaxed\nStandard supervised learning assumes $p_{tr}(x) = p_{te}(x)$. In practice, often $p_{tr}(x) \\neq p_{te}(x)$ — this setting is called **domain adaptation / covariate shift**.\n\n### Goal\nWe want to minimize the **true test risk**:\n$$\n\\mathbb{E}_{p_{te}(x)}[\\ell(y,f(x))] = \\int p_{te}(x)\\,\\ell(y,f(x))\\,dx\n$$\nbut only labeled data from $p_{tr}(x)$ is available.\n\n### Derivation: Importance-Weighted Risk\n**Step 1** — Multiply and divide by $p_{tr}(x)$ inside the integral:\n$$\n\\int p_{te}(x)\\,\\ell(y,f(x))\\,dx = \\int p_{tr}(x)\\,\\frac{p_{te}(x)}{p_{tr}(x)}\\,\\ell(y,f(x))\\,dx\n$$\n\n**Step 2** — Recognize this as an expectation under $p_{tr}(x)$:\n$$\n= \\mathbb{E}_{p_{tr}(x)}\\left[\\frac{p_{te}(x)}{p_{tr}(x)}\\,\\ell(y,f(x))\\right]\n$$\n\n**Step 3** — Approximate the expectation via the empirical training sample (Monte Carlo approximation):\n$$\n\\approx \\sum_{n=1}^{N} \\frac{p_{te}(x_n)}{p_{tr}(x_n)}\\,\\ell(y_n, f(x_n))\n$$\n\n### Result: Importance-Weighted Empirical Loss\n$$\n\\boxed{\\sum_{n=1}^{N} \\frac{p_{te}(x_n)}{p_{tr}(x_n)}\\,\\ell(y_n, f(x_n))}\n$$\n\n**Interpretation:** Each training loss term is reweighted by the **density ratio** (importance weight) $\\frac{p_{te}(x_n)}{p_{tr}(x_n)}$, giving more weight to training points that look like test-domain points.\n\n**Implementation note:** Requires estimating $p_{tr}(x)$ and $p_{te}(x)$ (e.g., by assuming a parametric form and fitting using unlabeled data from both domains). No specific density estimation method is detailed in the text.\n\n---\n\n## 3. Semi-Supervised Learning (SSL)\n\n### Setup and Definitions\n- Labeled data: $L = \\{x_i, y_i\\}_{i=1}^{L}$\n- Unlabeled data: $U = \\{x_j\\}_{j=L+1}^{L+U}$, typically $U \\gg L$\n- **Transductive** setting: unlabeled set $U$ is also the test set.\n- **Inductive** setting: model must generalize to unseen future test data (more standard).\n- Distinguished from **Semi-Unsupervised Learning**, where supervision comes as constraints (e.g., pairwise cluster constraints) rather than full labels — not the focus here.\n\n### Core SSL Assumptions\n1. **Smoothness assumption**: nearby points likely share the same label.\n2. **Cluster assumption**: points in the same cluster likely share the same label.\n3. **Low-density separation**: decision boundary should lie in low-density regions of input space.\n\n*(Note: The text states generative models used in EM-based SSL already implicitly encode some of these assumptions.)*\n\n---\n\n### 3.1 Graph-based Regularization for SSL\n\n**Graph construction**: Build a graph over all $L+U$ points using either:\n- $k$-nearest-neighbor connectivity, or\n- A fully connected weighted graph with Gaussian-kernel similarity:\n$$\na_{ij} = \\exp\\left(-\\frac{\\|x_i - x_j\\|^2}{\\sigma^2}\\right)\n$$\nwhere $A$ is the $(L+U)\\times(L+U)$ pairwise similarity matrix.\n\n**Objective Function**:\n$$\n\\min_{f} \\sum_{i \\in L} \\ell(y_i, f_i) + \\lambda R(f) + \\gamma \\sum_{i,j \\in L,U} a_{ij}(f_i - f_j)^2\n$$\n\n**Term-by-term explanation:**\n- $\\sum_{i\\in L}\\ell(y_i,f_i)$: standard supervised loss on labeled data only.\n- $\\lambda R(f)$: standard model regularizer (e.g., $\\ell_2$ norm).\n- $\\gamma \\sum a_{ij}(f_i-f_j)^2$: **graph Laplacian regularizer** — penalizes large prediction differences $f_i - f_j$ between similar (high $a_{ij}$) points, enforcing the smoothness assumption over **both labeled and unlabeled** data.\n\nThis lets unlabeled data influence learning through the graph structure even though it has no loss term of its own.\n\n---\n\n### 3.2 EM-based Generative Semi-Supervised Classification\n\n**Model / Likelihood** over labeled + unlabeled data:\n$$\np(D|\\theta) = \\prod_{i=1}^{L} p(x_i,y_i|\\theta) \\prod_{j=L+1}^{L+U} p(x_j|\\theta)\n= \\prod_{i=1}^{L} p(x_i,y_i|\\theta)\\prod_{j=L+1}^{L+U}\\sum_{y_j} p(x_j,y_j|\\theta)\n$$\n\n**Unknowns**:\n- Latent variables: labels $\\{y_j\\}_{j=L+1}^{L+U}$ of unlabeled points\n- Parameters: $\\theta$\n\n**Algorithm: EM for SSL**\n1. **E-step**: Given current parameter estimate $\\hat\\theta$, compute expected label for each unlabeled point:\n$$\nE[y_j] = (+1)\\cdot P(y_j=+1|\\hat\\theta,x_j) + (-1)\\cdot P(y_j=-1|\\hat\\theta,x_j)\n$$\n(this is the posterior class probability under the current model, used as a \"soft label\")\n\n2. **M-step**: Re-estimate $\\theta$ via standard MLE, treating the (expected/soft) labels from unlabeled data together with the true labels from labeled data.\n\n**Purpose**: General-purpose SSL framework; applicable to different data types by choosing an appropriate class-conditional distribution $p(x|y)$.\n\n**Caveat noted in the text**: This approach can fail if the assumed class-conditional distribution is **misspecified** — i.e., if the generative model's assumptions don't match the true data distribution, EM-based SSL can hurt rather than help performance. Care is needed in choosing $p(x|y)$.\n\n---\n\n## 4. Active Learning\n\n### Passive vs. Active Learning\n- **Passive learning**: learner has no control over which examples get labeled (standard supervised learning setup).\n- **Active learning**: learner can **query** labels for specific \"informative\" or \"hard\" unlabeled examples, aiming to reduce labeling cost while maximizing learning benefit.\n\n### Quantifying \"Usefulness\" of an Unlabeled Example $x$\nTwo probabilistic criteria mentioned (both based on the predictive distribution $p(y|x)$):\n\n1. **Entropy-based selection (classification)**:\n   - Compute entropy of $p(y|x,w)$ or the posterior predictive $p(y|x)$.\n   - Select example(s) with **largest entropy** (most uncertain prediction) for labeling.\n\n2. **Variance-based selection (regression)**:\n   - Compute variance of posterior predictive $p(y|x)$.\n   - Select example(s) with **largest variance** for labeling.\n\n**Rationale**: High entropy/variance indicates the model is most uncertain about that example's label, so labeling it is expected to be maximally informative for reducing model uncertainty.\n\n*(The text notes \"many other ways to utilize the information in $p(y|x)$\" exist but does not specify them.)*\n\n---\n\n## Key Technical Takeaways\n\n1. **Bias–variance decomposition** formally separates model error into an irreducible approximation term (bias, tied to model class richness) and a reducible-with-more-data estimation term (variance, tied to finite sample effects) — this underlies practical diagnosis of underfitting vs. overfitting via train/test error gaps.\n2. **Domain adaptation via importance weighting** provides a principled correction to empirical risk minimization when train/test distributions differ, but requires density ratio estimation $p_{te}(x)/p_{tr}(x)$, which is itself nontrivial and not detailed in the source.\n3. **SSL relies on structural assumptions** (smoothness, cluster, low-density separation) connecting unlabeled data's input distribution to the labeling function; two concrete algorithmic realizations are given: graph-Laplacian regularization (discriminative) and EM with latent labels (generative).\n4. **Graph regularization** and **EM-based SSL** both mathematically incorporate unlabeled points without requiring their labels: the former via pairwise smoothness penalties, the latter via marginalizing over unknown labels in the likelihood.\n5. **Active learning** reduces labeling effort by selecting examples with maximal predictive uncertainty (entropy or variance), rather than uniformly sampling from the input distribution.\n6. **Model misspecification risk**: the source explicitly warns that EM-based generative SSL can be harmed by incorrect class-conditional distribution assumptions — an important caveat rather than a guaranteed improvement.\n\n**Note on completeness**: The source is a lecture slide deck; several derivations (e.g., density estimation for importance weights, explicit EM"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Merge": [
+      {
+        "json": {
+          "text": "1. Paper Overview\n- Title: Bias/Variance Trade-off, Some Practical Issues, Semi-supervised and Active Learning\n- Authors: Piyush Rai\n- Research area: Machine Learning (introductory/educational)\n- Main topic: Conceptual overview of bias–variance trade-off, practical debugging guidelines, domain adaptation (when train/test distributions differ), semi‑supervised learning (SSL) techniques, and active learning strategies.\n\n2. Research Problem\n- What problem does the paper address?\n  - Explains fundamental problems and practical issues in supervised learning: the bias–variance decomposition and trade-off, how to debug poor model performance, how to handle differing train and test distributions (domain adaptation / covariate shift), how to exploit abundant unlabeled data (semi‑supervised learning), and how to selectively acquire labels efficiently (active learning).\n- Why is the problem important according to the authors?\n  - Real-world ML faces limits from finite data, model misspecification, mismatched training/test domains, and the expense/scarcity of labeled data. Understanding these issues and methods to mitigate them is critical for building reliable models.\n\n3. Research Objective\n- Aim: To present and explain key conceptual frameworks and practical approaches for:\n  - Understanding and managing the bias–variance trade-off.\n  - Diagnosing whether poor performance arises from high bias or high variance and recommending remedies.\n  - Addressing domain differences between training and test data.\n  - Leveraging unlabeled data via semi‑supervised learning (graph regularization, EM-based generative SSL).\n  - Designing active learning queries that request the most informative labels.\n\n4. Methodology\n- Research approach:\n  - Didactic survey/lecture summarizing theoretical decompositions, assumptions, and standard algorithmic approaches (no empirical experiments reported).\n- Dataset/sample:\n  - Not specified in the provided text (the material is conceptual; no datasets or empirical benchmarks are given).\n- Tools, models, or techniques used:\n  - Bias–variance decomposition (approximation error vs. estimation error).\n  - Regularization, model complexity control (e.g., linear vs. polynomial models).\n  - Importance-weighted loss for domain adaptation: weight each training loss term by p_te(x)/p_tr(x).\n  - Graph-based semi‑supervised regularization: build similarity graph (k‑NN or fully connected weighted graph with weights a_ij = exp(−||x_i − x_j||^2/σ^2)) and add graph smoothness penalty ∑_{i,j} a_ij (f_i − f_j)^2.\n  - EM-based generative semi‑supervised learning: maximize joint likelihood p(D|θ) with latent labels for unlabeled data; use E-step to compute expected labels and M-step to reestimate θ.\n  - Active learning selection criteria: entropy of p(y|x), variance of posterior predictive, and other uncertainty-based measures.\n  - Standard supervised models are referenced (logistic regression, SVM) as examples when discussing debugging.\n- Experimental or analytical procedure:\n  - Not applicable / Not specified — the document outlines methods and formulas but does not describe experiments or empirical evaluation.\n\n5. Key Findings\n(Since this is an instructional/survey-style document, “findings” are conceptual takeaways rather than empirical results.)\n- Bias–variance decomposition:\n  - Test error can be decomposed into approximation error (min_{f*∈F} error(f*)) and estimation error (error(f) − min_{f*∈F} error(f*)). Making the model class F richer reduces approximation error but tends to increase estimation error (bias–variance trade-off).\n- Debugging guidelines:\n  - Distinguish high bias (both training and test errors large) from high variance (low training error, large test error).\n  - Remedies: For high bias → increase model complexity / add features; for high variance → add more training data, simplify model, reduce features, or increase regularization.\n- Domain adaptation (train/test distributions differ):\n  - Reweight training losses by importance weights p_te(x)/p_tr(x) to approximate minimizing expected test loss: E_{p_te}[ℓ(y,f(x))] ≈ ∑_n (p_te(x_n)/p_tr(x_n)) ℓ(y_n, f(x_n)); requires estimating the two densities (can use unlabeled data).\n- Semi‑supervised learning:\n  - Unlabeled data can help under assumptions: smoothness (nearby points share labels), cluster assumption (points in same cluster share labels), or low-density separation (decision boundary lies in low-density regions).\n  - Graph-based SSL objective: minimize ∑_{i∈L} ℓ(y_i, f_i) + λ R(f) + γ ∑_{i,j} a_ij (f_i − f_j)^2.\n  - EM-based generative SSL: treat labels of unlabeled examples as latent, maximize joint likelihood p(D|θ) = ∏_{labeled} p(x_i,y_i|θ) ∏_{unlabeled} ∑_{y} p(x_j,y|θ) via EM.\n  - Caveat: SSL methods can fail if their underlying assumptions (e.g., class-conditional models) are incorrect.\n- Active learning:\n  - Active learners can request labels for the most informative/hard examples.\n  - Use measures derived from predictive distributions—e.g., entropy of p(y|x) for classification or posterior predictive variance for regression—to select queries.\n\n6. Main Conclusion\n- The slides conclude that:\n  - Understanding the bias–variance trade-off and correctly diagnosing whether high bias or high variance causes poor performance is central to choosing remedies.\n  - When training and test distributions differ, importance-weighting or learning transformations to align distributions are viable strategies but require density estimation or unlabeled data from both domains.\n  - Unlabeled data can be valuable under reasonable assumptions; SSL methods (graph-based regularization and EM-based generative approaches) operationalize these assumptions but depend on their validity.\n  - Active learning can reduce labeling cost by querying the most informative examples, using uncertainty-based criteria derived from predictive distributions.\n\n7. Limitations\n- Explicit limitations mentioned by the authors:\n  - Semi‑supervised methods can fail if their assumptions are inappropriate (e.g., incorrectly specified class-conditional distributions in EM-based SSL). Thus, choice of class‑conditional model must be careful/flexible.\n  - For importance-weighted domain adaptation, one must estimate p_tr(x) and p_te(x); errors in these density estimates will affect results.\n- No empirical limitations, benchmarking caveats, or quantitative limitations are provided because the text is a conceptual lecture (experimental details are Not specified in the provided text).\n\n8. Future Work\n- Not specified in the provided text (the slides do not list explicit future research directions; they present standard approaches and practical guidance).\n\n9. Key Takeaways (3–5)\n- 1) The bias–variance trade-off: richer model classes reduce approximation error (bias) but typically increase estimation error (variance); diagnose via training vs. test error and apply appropriate remedies.\n- 2) When training and test distributions differ, reweighting training losses by p_te(x)/p_tr(x) or learning domain-invariant transformations uses unlabeled data to better approximate test loss.\n- 3) Semi‑supervised learning can leverage abundant unlabeled data under assumptions (smoothness, cluster, low-density separation); common methods include graph-based regularization and EM-based generative models, but their success depends on those assumptions and model specification.\n- 4) Active learning reduces labeling effort by querying the most informative examples; uncertainty measures such as predictive entropy or posterior variance are practical selection criteria.\n- 5) Practical ML debugging relies on principled diagnosis (bias vs. variance) and a toolbox of remedies (model complexity, regularization, more data, domain correction, leveraging unlabeled data, or active queries), but each method requires attention to underlying assumptions and data conditions."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "text": "# Summary: Bias/Variance Trade-off, Practical ML Issues, Semi-supervised and Active Learning\n\n## 1. Bias/Variance Trade-off\n\n### Key Definitions\n- **Model class $F$**: a hypothesis space (e.g., linear classifiers with fixed features)\n- **$f$**: the model actually learned from a finite training set\n- **$f^* \\in F$**: the best possible model in $F$ under infinite training data\n\n### Core Equation: Error Decomposition\n$$\n\\ell(f) = \\underbrace{\\Big[\\min_{f^*\\in F}\\ell(f^*)\\Big]}_{\\text{approximation error (bias)}} + \\underbrace{\\Big[\\ell(f) - \\min_{f^*\\in F}\\ell(f^*)\\Big]}_{\\text{estimation error (variance)}}\n$$\n\n**Interpretation:**\n- **Approximation error / bias**: error of the *best achievable* model in $F$; large when $F$ is too simple (underfitting).\n- **Estimation error / variance**: extra error incurred by learning $f$ from *finite* data instead of having the ideal $f^*$; large when $F$ is complex enough to overfit.\n\n### Trade-off Logic\n- Increasing model complexity (richer $F$, higher-order features) → **decreases bias**, but\n- **increases variance**, since $f$ becomes more sensitive to the specific training sample and may overfit.\n- This is the classical **bias–variance trade-off**, visualized as a U-shaped test-error curve vs. model complexity, with:\n  - Bias dominating error at low complexity (**underfitting**)\n  - Variance dominating error at high complexity (**overfitting**)\n\n### Diagnostic Rule (from train/test error gap)\n- **High bias**: both training and test error are large (model too weak even on training data).\n- **High variance**: training error is small but test error is large (large train-test gap → overfitting).\n\n### Practical Debugging Guidelines\n| Diagnosis | Recommended Fix |\n|---|---|\n| High Bias (underfitting) | More training data does **not** help; instead increase model richness (add features, use more complex model class) |\n| High Variance (overfitting) | More training data **can** help; alternatively simplify model, reduce features, or increase regularization |\n\n*(No formal derivation of these rules is given beyond the empirical train/test error behavior described.)*\n\n---\n\n## 2. Domain Adaptation (Train/Test Distribution Mismatch)\n\n### Assumption Being Relaxed\nStandard supervised learning assumes $p_{tr}(x) = p_{te}(x)$. In practice, often $p_{tr}(x) \\neq p_{te}(x)$ — this setting is called **domain adaptation / covariate shift**.\n\n### Goal\nWe want to minimize the **true test risk**:\n$$\n\\mathbb{E}_{p_{te}(x)}[\\ell(y,f(x))] = \\int p_{te}(x)\\,\\ell(y,f(x))\\,dx\n$$\nbut only labeled data from $p_{tr}(x)$ is available.\n\n### Derivation: Importance-Weighted Risk\n**Step 1** — Multiply and divide by $p_{tr}(x)$ inside the integral:\n$$\n\\int p_{te}(x)\\,\\ell(y,f(x))\\,dx = \\int p_{tr}(x)\\,\\frac{p_{te}(x)}{p_{tr}(x)}\\,\\ell(y,f(x))\\,dx\n$$\n\n**Step 2** — Recognize this as an expectation under $p_{tr}(x)$:\n$$\n= \\mathbb{E}_{p_{tr}(x)}\\left[\\frac{p_{te}(x)}{p_{tr}(x)}\\,\\ell(y,f(x))\\right]\n$$\n\n**Step 3** — Approximate the expectation via the empirical training sample (Monte Carlo approximation):\n$$\n\\approx \\sum_{n=1}^{N} \\frac{p_{te}(x_n)}{p_{tr}(x_n)}\\,\\ell(y_n, f(x_n))\n$$\n\n### Result: Importance-Weighted Empirical Loss\n$$\n\\boxed{\\sum_{n=1}^{N} \\frac{p_{te}(x_n)}{p_{tr}(x_n)}\\,\\ell(y_n, f(x_n))}\n$$\n\n**Interpretation:** Each training loss term is reweighted by the **density ratio** (importance weight) $\\frac{p_{te}(x_n)}{p_{tr}(x_n)}$, giving more weight to training points that look like test-domain points.\n\n**Implementation note:** Requires estimating $p_{tr}(x)$ and $p_{te}(x)$ (e.g., by assuming a parametric form and fitting using unlabeled data from both domains). No specific density estimation method is detailed in the text.\n\n---\n\n## 3. Semi-Supervised Learning (SSL)\n\n### Setup and Definitions\n- Labeled data: $L = \\{x_i, y_i\\}_{i=1}^{L}$\n- Unlabeled data: $U = \\{x_j\\}_{j=L+1}^{L+U}$, typically $U \\gg L$\n- **Transductive** setting: unlabeled set $U$ is also the test set.\n- **Inductive** setting: model must generalize to unseen future test data (more standard).\n- Distinguished from **Semi-Unsupervised Learning**, where supervision comes as constraints (e.g., pairwise cluster constraints) rather than full labels — not the focus here.\n\n### Core SSL Assumptions\n1. **Smoothness assumption**: nearby points likely share the same label.\n2. **Cluster assumption**: points in the same cluster likely share the same label.\n3. **Low-density separation**: decision boundary should lie in low-density regions of input space.\n\n*(Note: The text states generative models used in EM-based SSL already implicitly encode some of these assumptions.)*\n\n---\n\n### 3.1 Graph-based Regularization for SSL\n\n**Graph construction**: Build a graph over all $L+U$ points using either:\n- $k$-nearest-neighbor connectivity, or\n- A fully connected weighted graph with Gaussian-kernel similarity:\n$$\na_{ij} = \\exp\\left(-\\frac{\\|x_i - x_j\\|^2}{\\sigma^2}\\right)\n$$\nwhere $A$ is the $(L+U)\\times(L+U)$ pairwise similarity matrix.\n\n**Objective Function**:\n$$\n\\min_{f} \\sum_{i \\in L} \\ell(y_i, f_i) + \\lambda R(f) + \\gamma \\sum_{i,j \\in L,U} a_{ij}(f_i - f_j)^2\n$$\n\n**Term-by-term explanation:**\n- $\\sum_{i\\in L}\\ell(y_i,f_i)$: standard supervised loss on labeled data only.\n- $\\lambda R(f)$: standard model regularizer (e.g., $\\ell_2$ norm).\n- $\\gamma \\sum a_{ij}(f_i-f_j)^2$: **graph Laplacian regularizer** — penalizes large prediction differences $f_i - f_j$ between similar (high $a_{ij}$) points, enforcing the smoothness assumption over **both labeled and unlabeled** data.\n\nThis lets unlabeled data influence learning through the graph structure even though it has no loss term of its own.\n\n---\n\n### 3.2 EM-based Generative Semi-Supervised Classification\n\n**Model / Likelihood** over labeled + unlabeled data:\n$$\np(D|\\theta) = \\prod_{i=1}^{L} p(x_i,y_i|\\theta) \\prod_{j=L+1}^{L+U} p(x_j|\\theta)\n= \\prod_{i=1}^{L} p(x_i,y_i|\\theta)\\prod_{j=L+1}^{L+U}\\sum_{y_j} p(x_j,y_j|\\theta)\n$$\n\n**Unknowns**:\n- Latent variables: labels $\\{y_j\\}_{j=L+1}^{L+U}$ of unlabeled points\n- Parameters: $\\theta$\n\n**Algorithm: EM for SSL**\n1. **E-step**: Given current parameter estimate $\\hat\\theta$, compute expected label for each unlabeled point:\n$$\nE[y_j] = (+1)\\cdot P(y_j=+1|\\hat\\theta,x_j) + (-1)\\cdot P(y_j=-1|\\hat\\theta,x_j)\n$$\n(this is the posterior class probability under the current model, used as a \"soft label\")\n\n2. **M-step**: Re-estimate $\\theta$ via standard MLE, treating the (expected/soft) labels from unlabeled data together with the true labels from labeled data.\n\n**Purpose**: General-purpose SSL framework; applicable to different data types by choosing an appropriate class-conditional distribution $p(x|y)$.\n\n**Caveat noted in the text**: This approach can fail if the assumed class-conditional distribution is **misspecified** — i.e., if the generative model's assumptions don't match the true data distribution, EM-based SSL can hurt rather than help performance. Care is needed in choosing $p(x|y)$.\n\n---\n\n## 4. Active Learning\n\n### Passive vs. Active Learning\n- **Passive learning**: learner has no control over which examples get labeled (standard supervised learning setup).\n- **Active learning**: learner can **query** labels for specific \"informative\" or \"hard\" unlabeled examples, aiming to reduce labeling cost while maximizing learning benefit.\n\n### Quantifying \"Usefulness\" of an Unlabeled Example $x$\nTwo probabilistic criteria mentioned (both based on the predictive distribution $p(y|x)$):\n\n1. **Entropy-based selection (classification)**:\n   - Compute entropy of $p(y|x,w)$ or the posterior predictive $p(y|x)$.\n   - Select example(s) with **largest entropy** (most uncertain prediction) for labeling.\n\n2. **Variance-based selection (regression)**:\n   - Compute variance of posterior predictive $p(y|x)$.\n   - Select example(s) with **largest variance** for labeling.\n\n**Rationale**: High entropy/variance indicates the model is most uncertain about that example's label, so labeling it is expected to be maximally informative for reducing model uncertainty.\n\n*(The text notes \"many other ways to utilize the information in $p(y|x)$\" exist but does not specify them.)*\n\n---\n\n## Key Technical Takeaways\n\n1. **Bias–variance decomposition** formally separates model error into an irreducible approximation term (bias, tied to model class richness) and a reducible-with-more-data estimation term (variance, tied to finite sample effects) — this underlies practical diagnosis of underfitting vs. overfitting via train/test error gaps.\n2. **Domain adaptation via importance weighting** provides a principled correction to empirical risk minimization when train/test distributions differ, but requires density ratio estimation $p_{te}(x)/p_{tr}(x)$, which is itself nontrivial and not detailed in the source.\n3. **SSL relies on structural assumptions** (smoothness, cluster, low-density separation) connecting unlabeled data's input distribution to the labeling function; two concrete algorithmic realizations are given: graph-Laplacian regularization (discriminative) and EM with latent labels (generative).\n4. **Graph regularization** and **EM-based SSL** both mathematically incorporate unlabeled points without requiring their labels: the former via pairwise smoothness penalties, the latter via marginalizing over unknown labels in the likelihood.\n5. **Active learning** reduces labeling effort by selecting examples with maximal predictive uncertainty (entropy or variance), rather than uniformly sampling from the input distribution.\n6. **Model misspecification risk**: the source explicitly warns that EM-based generative SSL can be harmed by incorrect class-conditional distribution assumptions — an important caveat rather than a guaranteed improvement.\n\n**Note on completeness**: The source is a lecture slide deck; several derivations (e.g., density estimation for importance weights, explicit EM"
+        },
+        "pairedItem": {
+          "item": 0,
+          "input": 1
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3dc66c6e-7081-4c3a-a578-63d22ceff5a7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "87f784702f4274bd6b57595279a4bda0fe4acf163da8d01ce99d1f90ce125e83"
+  },
+  "nodeGroups": [],
+  "id": "RXMbSxAt6QIT459l",
+  "tags": []
+}

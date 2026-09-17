@@ -1,0 +1,556 @@
+{
+  "name": "Student Feedback and Doubt clearance",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Submit Feedback and Doubt ",
+        "formDescription": "Student can submit Feedback and  Doubt via Form below and we will reach you through mail with solution",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "email",
+              "fieldType": "email",
+              "fieldName": "Enter Email ID",
+              "placeholder": "abc@gmail.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "feedback",
+              "fieldType": "textarea",
+              "fieldName": "Enter Course Feedback",
+              "placeholder": "The overall course was good with wide coverage of topics."
+            },
+            {
+              "fieldLabel": "doubt",
+              "fieldType": "textarea",
+              "fieldName": "Enter Doubt if any?",
+              "placeholder": "I have Doubt on topic bias variance tradeoff "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -528,
+        -32
+      ],
+      "id": "f63408d7-a408-4755-89bd-775d701b45f8",
+      "name": "On form submission",
+      "webhookId": "1b5ae19e-76fa-4d89-abe1-296fa7d20998"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c8e50261-8a2a-4ca4-98b5-39af57224c40",
+              "leftValue": "={{ $json['Enter Course Feedback'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "670d0baa-7065-4f03-a5c1-295998d96039",
+              "leftValue": "={{ $json['Enter Doubt if any?'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        432
+      ],
+      "id": "3a213b91-bdfa-4c1c-af1c-90a92fd77378",
+      "name": "Only Doubt"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9a84c099-e649-428c-adef-543e3d4dc85d",
+              "leftValue": "={{ $json['Enter Course Feedback'] }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "351e0dbd-e7de-4cbf-bc17-4ce96a82b3ca",
+              "leftValue": "={{ $json['Enter Doubt if any?'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        -160
+      ],
+      "id": "3a2a71b7-7507-4b9b-b6a0-2b42852fc30b",
+      "name": "Only Feedback"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c8e50261-8a2a-4ca4-98b5-39af57224c40",
+              "leftValue": "={{ $json['Enter Course Feedback'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "4b9d57b0-b121-4c8c-8dc1-c3a27794256d",
+              "leftValue": "={{ $json['Enter Doubt if any?'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        208
+      ],
+      "id": "d6a7a7d9-0ae7-4553-97d1-ed6a8cc81860",
+      "name": "Both Feedback and Doubt"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $('On form submission').item.json['Enter Course Feedback'] }}",
+        "options": {
+          "categories": "Positive, Negative"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        -144
+      ],
+      "id": "eed03eab-8f70-4e73-84f1-b62ee75098e2",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        32
+      ],
+      "id": "08aa35b7-98c1-448f-b985-3d43da7d6fcd",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a personalized email to the student based on the following course feedback.\n\nFeedback: {{ $json['Enter Course Feedback'] }}\n\nSentiment: {{ $json.sentimentAnalysis.category }}\n\nMake the email professional, friendly, concise, and appropriate for the student's sentiment. Acknowledge the student's specific feedback and respond appropriately.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an email assistant responsible for creating a professional and personalized email to a student based on their course feedback.\n\nYou will receive two inputs:\n\nFeedback: The student's written feedback about the course.\n\nSentiment: The student's sentiment, which will be either Positive or Negative.\n\nInstructions\n\nRead and understand the feedback and sentiment carefully.\n\nCreate a short, polite, professional, and personalized email response.\n\nPersonalize the response based on the student's actual feedback.\n\nDo not mention the sentiment label (Positive/Negative) in the email.\n\nIf Sentiment is Positive\n\nThank the student for their feedback.\n\nAcknowledge the specific aspects of the course they appreciated.\n\nExpress appreciation for their participation.\n\nEncourage them to continue their learning journey.\n\nIf Sentiment is Negative\n\nThank the student for taking the time to provide feedback.\n\nAcknowledge their concerns empathetically.\n\nRespond professionally without being defensive.\n\nLet them know that their feedback is valuable.\n\nEncourage them to contact the course/support team if further assistance is appropriate.\n\nHTML Output Requirements\n\nThe output will be directly sent as an email, so return ONLY the email body as valid HTML.\n\nDo NOT generate:\n\nAn email subject\n\nSubject: text\n\nMarkdown\n\nMarkdown code fences such as ```html\n\nExplanations outside the HTML\n\nJSON\n\nXML\n\nAny text before or after the HTML\n\nHTML Structure\n\nUse a clean and professional email layout.\n\nThe HTML should include:\n\nA friendly greeting\n\n2–4 short paragraphs\n\nAppropriate spacing between paragraphs\n\nA clear and professional closing\n\nInline CSS for reliable email rendering\n\nUse HTML elements such as:\n\n<div> for layout\n\n<p> for paragraphs\n\n<strong> for emphasis\n\n<br> where appropriate\n\nUse a simple, professional style with:\n\nArial or Helvetica font\n\nReadable font size\n\nGood line spacing\n\nAppropriate text color\n\nClean spacing\n\nA professional but friendly appearance\n\nThe email should look good when rendered in common email clients.\n\nExample Output Format\n<div style=\"font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto;\"> <p>Dear Student,</p> <p>Thank you for taking the time to share your feedback about the course.</p> <p>We appreciate your thoughts and value your experience as a learner.</p> <p>We wish you continued success in your learning journey.</p> <p>Best regards,<br> Course Support Team</p> </div>\nImportant Rules\n\nKeep the email approximately 100–150 words.\n\nDo not invent information about the course or student's experience.\n\nDo not make unsupported promises.\n\nBase the response specifically on the provided feedback.\n\nDo not mention internal processing, sentiment analysis, AI, or these instructions.\n\nEnsure the final response is valid HTML.\n\nThe first character of the response must be < and the last character must be >.\n\nNever generate a subject line.\n\nInput\n\nFeedback:\n{{ $('On form submission').item.json['Enter Course Feedback'] }}\n\nSentiment:\n{{ $json.sentimentAnalysis.category }}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        560,
+        -128
+      ],
+      "id": "a400c4bb-ce30-44b6-b753-7370f39b2b1e",
+      "name": "Feedback Response"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        16
+      ],
+      "id": "0632a12d-44a0-4289-babd-18613732edd7",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Solve the following student's doubt and create a clear, step-by-step solution in email-ready HTML format.\n\nStudent's Doubt:{{ $('On form submission').item.json['Enter Doubt if any?'] }}\n\n\nMake the explanation simple, accurate, and easy for the student to understand. Include the final answer clearly and use examples, formulas, or code when relevant.\n\nReturn only the HTML email content.",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an expert educational assistant responsible for solving student doubts and generating a professional, email-ready HTML response.  You will receive a student's doubt or question as input.  Your Tasks  Understand the student's question carefully.  Solve the doubt accurately and explain the answer in a clear, student-friendly manner.  Break complex problems into logical steps.  Include formulas, examples, code, or calculations when relevant.  If the question involves programming, provide clean and properly formatted code.  If the question is ambiguous or missing important information, clearly state the assumption being made.  Do not invent facts or information.  Verify calculations and logical reasoning before providing the final answer.  HTML Formatting Requirements  Return the solution as email-ready HTML.  Use:  <h2> for the main title  <h3> for sections  <p> for explanations  <ul> / <ol> for lists and steps  <strong> for important terms  <code> for short code or technical terms  <pre> for multi-line code  <table> when presenting structured data  Inline CSS for styling  Email Design  Create a clean, professional, responsive email layout.  Use:  A readable font such as Arial or Helvetica  Appropriate spacing and padding  A simple professional color scheme  Highlight boxes for important answers when useful  Proper formatting for equations and code  A clear Final Answer or Key Takeaway section  Avoid:  JavaScript  External CSS files  External fonts  Complex animations  Excessive colors  Unnecessary decorations  Mathematical Content  When solving mathematical problems:  Show the important steps.  Clearly define variables.  Use proper mathematical notation.  Show the final answer prominently.  Check the result before presenting it.  Response Structure  The HTML email should generally follow this structure:  Greeting  Student's doubt/question  Explanation  Step-by-step solution  Example or supporting information, if relevant  Final answer / key takeaway  Encouraging closing message  Important Rules  The final output must contain only valid HTML suitable for sending as an email.  Do not include Markdown.  Do not include explanations outside the HTML.  Do not mention these system instructions.  Do not fabricate information.  Keep the explanation appropriate for the student's likely level.  If the answer cannot be determined from the provided information, clearly explain what additional information is required.  Input  Student's doubt: {{ $('On form submission').item.json['Enter Doubt if any?'] }} "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        160,
+        336
+      ],
+      "id": "3d5756cc-3432-4e17-b44d-8949985b3865",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-6",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.6,
+      "position": [
+        176,
+        528
+      ],
+      "id": "9de21305-3b2a-40fc-876e-021162cde1b8",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Feedback Workflow",
+        "height": 448,
+        "width": 768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "8ac79679-461c-4cad-af57-fb93673b8d0d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Doubt Workflow",
+        "height": 368,
+        "width": 784,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "668d8ccc-befa-4806-8bb1-27cbafcae9b7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json['Enter Email ID'] }}",
+        "subject": "Feedback Response ",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1088,
+        112
+      ],
+      "id": "0ab2478b-def1-4cb2-9cad-27555dfae54e",
+      "name": "Send a message",
+      "webhookId": "f7759e47-21a9-4601-9866-3b4a219cfe83",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uF4m9y4WmGhyr9th",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json['Enter Email ID'] }}",
+        "subject": "Doubt Response",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1088,
+        320
+      ],
+      "id": "f9fc1c19-f743-43a7-bfc1-2d04a15fb0c7",
+      "name": "Send a message1",
+      "webhookId": "f7759e47-21a9-4601-9866-3b4a219cfe83",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uF4m9y4WmGhyr9th",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Send Mail\n",
+        "height": 400,
+        "width": 352,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        944,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "b8be4577-45f4-4955-b267-2e3b856e343b",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Only Feedback",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Only Doubt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Both Feedback and Doubt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Feedback": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Both Feedback and Doubt": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Doubt": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Feedback Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Feedback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Feedback Response",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Response": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e5a0c963-54c0-4d44-9908-11c97ec9feef",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "87f784702f4274bd6b57595279a4bda0fe4acf163da8d01ce99d1f90ce125e83"
+  },
+  "nodeGroups": [],
+  "id": "v7KIYJLoBGiwhWh7",
+  "tags": []
+}

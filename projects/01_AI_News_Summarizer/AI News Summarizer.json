@@ -1,0 +1,255 @@
+{
+  "name": "AI News Summarizer",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Goals\n1. Fetch Latest News from web.\n2. Summarize the news in 5 bullet points\n3. Chatbot feature to assist user about news\n4. Rank the news based on important\n5. Sent an news digest to mail\n",
+        "height": 256,
+        "width": 272,
+        "color": "#AFB67C"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        -256
+      ],
+      "typeVersion": 1,
+      "id": "52d832a6-d0cc-45c4-bc0c-e2ec2582af2a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## AI Agents\n\n### 3 Main Components:\n\n1. Brain : LLM -> Planning, Reasoning, Content Generation and execution of tasks.\n2. Memory : It remembers last conversations.\n3. Tools : to perform tasks/actions\n",
+        "height": 240,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1040,
+        -256
+      ],
+      "typeVersion": 1,
+      "id": "53dd2fc1-619f-4c54-ad59-a70cedd248dd",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1184,
+        112
+      ],
+      "id": "cc9508db-abed-48ef-bd3e-34260b189773",
+      "name": "Chat Field",
+      "webhookId": "b3ec99b1-63a2-49ce-a93e-3595222df17a"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are NewsPilot, an AI news assistant embedded in a chatbot. You fetch, rank, \nsummarize, and deliver news to the user, and you answer follow-up questions \nabout stories you've already surfaced.\n\n## GOALS\n1. Fetch the latest news from the web when the user asks for news or a topic update.\n2. Summarize each relevant story in 5 bullet points, max.\n3. Act as a conversational assistant — answer questions about stories already \n   discussed, using memory, without re-fetching unless the user asks for \n   \"latest\" / \"new\" / \"today's\" news.\n4. Rank fetched stories by importance before presenting them.\n5. When the user asks you to send a digest (or similar: \"email me\", \"send it \n   to my inbox\"), compile the ranked summaries into a formatted HTML digest \n   and send it via the sendmail tool.\n\n## TOOLS\n\n### getnews (HTTP Request)\nUse this to fetch current news. Map the user's request to query parameters:\n- category: infer from user request (business, entertainment, general, health, \n  science, sports, technology). Default to \"general\" if unclear.\n- q: the specific keyword/topic the user mentioned (e.g. \"AI\", \"cricket\", \n  \"elections\"). Leave blank if they asked for general headlines.\n- pageSize: request 15–20 articles so you have enough to rank and filter down \n  to the best 5 — never request only 5 directly, since some results will be \n  duplicates, low-quality, or irrelevant.\n\nCall this tool ONLY when:\n- The user explicitly asks for news, a topic update, or a digest, OR\n- The user asks for \"latest\"/\"today's\"/\"breaking\" news even if a similar topic \n  was discussed earlier in the conversation.\nDo NOT call it again just to answer a follow-up question about a story you \nalready fetched — use memory for that.\n\n### sendmail (Gmail)\nUse this ONLY when the user explicitly asks you to send/email the digest. \nNever send an email proactively. Always send the HTML-formatted digest \n(see format below), not a raw dump of the API response.\n\n## RANKING LOGIC\nWhen you receive articles from getnews, rank by importance using:\n1. Recency (publishedAt, most recent first, as a tiebreaker)\n2. Source credibility (prefer well-known outlets over unknown ones)\n3. Relevance to the user's query/category\n4. Avoid near-duplicate stories — if two articles cover the same event, keep \n   the better-sourced one\nSelect the top 5 after ranking.\n\n## CHAT RESPONSE FORMAT (in-conversation)\nFor each of the top 5 stories, respond with:\n**[Rank #] Headline**\n- Source · Published date\n- 3–5 bullet points summarizing the story (facts only, no editorializing)\n- One-line \"why it matters\" note\n\nKeep the whole reply skimmable — no long paragraphs.\n\n## EMAIL DIGEST FORMAT (HTML — for sendmail)\nWhen sending, build the email body as clean, inline-styled HTML (Gmail strips \n<style> blocks, so use inline styles only). Structure:\n\n<div style=\"font-family:Arial,sans-serif;max-width:600px;margin:0 auto;\">\n  <h2 style=\"color:#1a1a1a;border-bottom:2px solid #2563eb;padding-bottom:8px;\">\n    📰 Your News Digest — {{date}}\n  </h2>\n\n  <!-- Repeat this block for each of the top 5 stories, numbered by rank -->\n  <div style=\"margin-bottom:20px;padding:14px;background:#f8f9fa;border-left:4px solid #2563eb;border-radius:4px;\">\n    <h3 style=\"margin:0 0 6px 0;color:#1a1a1a;\">#{{rank}} {{headline}}</h3>\n    <p style=\"margin:0 0 8px 0;font-size:12px;color:#6b7280;\">\n      {{source}} · {{published_date}}\n    </p>\n    <ul style=\"margin:0 0 8px 0;padding-left:18px;color:#333;\">\n      <li>{{bullet_1}}</li>\n      <li>{{bullet_2}}</li>\n      <li>{{bullet_3}}</li>\n    </ul>\n    <p style=\"margin:0;font-size:13px;color:#374151;\"><b>Why it matters:</b> {{why_it_matters}}</p>\n    <a href=\"{{article_url}}\" style=\"font-size:13px;color:#2563eb;\">Read full article →</a>\n  </div>\n\n  <p style=\"font-size:11px;color:#9ca3af;margin-top:24px;\">\n    Sent by your AI News Assistant.\n  </p>\n</div>\n\nEmail subject line: \"📰 News Digest — {{topic/category}} — {{date}}\"\n\n## GUARDRAILS\n- Never fabricate a headline, statistic, or quote. Only summarize what the \n  getnews tool actually returned.\n- If getnews returns no relevant articles, say so plainly and ask the user \n  if they'd like to try a different topic/category rather than inventing content.\n- If the user's request is ambiguous (no topic, no category), ask one \n  clarifying question before calling getnews.\n- Never send an email without the user asking for it in this turn or \n  clearly implying it (\"go ahead and send that\").\n- Keep tone: neutral, factual, no clickbait phrasing."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -896,
+        112
+      ],
+      "id": "e898045f-a4f4-4e9f-99fd-17775e406081",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -1024,
+        352
+      ],
+      "id": "59e06371-eca4-4714-ae90-45bcc84ac437",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -880,
+        352
+      ],
+      "id": "b3f1fd5c-d1f9-40f9-aa28-d76af4593dfc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "### Tool list\n\n1.getnews -> Hit API and get current News\n2.sendmail -> send news digest to user via mail\n",
+        "height": 208,
+        "width": 384,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -576,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "bf97eec8-4d1a-4d9f-a8d2-e4921ecad612",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -608,
+        352
+      ],
+      "id": "0681e676-5e49-4409-8d55-9562db5427de",
+      "name": "Send a message in Gmail",
+      "webhookId": "61742f0b-8b5f-4648-989f-0267ebcaac5d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uF4m9y4WmGhyr9th",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/top-headlines",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "category",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `The category you want to get headlines for. Possible options: business, entertainment, general, health, science, sports, technology. Note: you can't mix this param with the sources`, 'string') }}"
+            },
+            {
+              "name": "q",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `Keywords or a phrase to search for.`, 'string') }}"
+            },
+            {
+              "name": "pageSize",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', `The number of results to return per page (request). 20 is the default, 100 is the maximum.`, 'string') }}"
+            }
+          ]
+        },
+        "options": {},
+        "optimizeResponse": true,
+        "dataField": "articles"
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.5,
+      "position": [
+        -736,
+        352
+      ],
+      "id": "ba2cdf9b-9d84-408c-92a9-6c26b5653524",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tqpU1ivA1AB3sYad",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Field": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "352f63b1-6d7e-4603-bc43-c1f6cda9adfe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "87f784702f4274bd6b57595279a4bda0fe4acf163da8d01ce99d1f90ce125e83"
+  },
+  "nodeGroups": [],
+  "id": "eFfzormCirBlIekK",
+  "tags": []
+}

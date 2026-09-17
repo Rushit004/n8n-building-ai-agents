@@ -1,0 +1,224 @@
+{
+  "name": "Send Coupon Premium customers",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -48
+      ],
+      "id": "058587df-b98b-42d7-862c-c655c49f2d79",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"name\": [\"Rushit\",\"Nilkanth\",\"Prince\"],\n  \"age\":[19,20,25],\n  \"order_amount\":[3,15,6]\n  \n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -144,
+        -48
+      ],
+      "id": "a700e2c4-3c1c-4d6b-ad61-cea00a12213a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "name, age, order_amount",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -48
+      ],
+      "id": "a1c41a19-2e44-43b0-a3ac-5567632932e5",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e6544f01-cc06-43a0-a73f-5ceae7efc364",
+              "leftValue": "={{ $json.order_amount }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        -48
+      ],
+      "id": "04552399-5ed3-4534-81f8-3aff2c409ecd",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        528,
+        48
+      ],
+      "id": "14648a7a-70f4-42cf-bbc8-7c0e792ba990",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "Create a clean, modern discount coupon with bold text “20% FLAT DISCOUNT”, attractive colors, premium design, and a simple shopping-themed background.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "d686a805-73b9-422d-b8ad-3496bf215a2c",
+      "name": "Generate an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ghetiyanilkanth84@gmail.com",
+        "subject": "You had a grate shoping you got coupon",
+        "message": "i am Rushit your  Bro. ",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        -144
+      ],
+      "id": "cad173d2-58af-4017-9c74-35ab1072a5da",
+      "name": "Send a message",
+      "webhookId": "94b47558-1d03-459e-ae1f-1c7da02d6f04",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uF4m9y4WmGhyr9th",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "792401d0-cb37-4e9f-9859-d93ed1344823",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "87f784702f4274bd6b57595279a4bda0fe4acf163da8d01ce99d1f90ce125e83"
+  },
+  "nodeGroups": [],
+  "id": "mIeAegPSIeM4Npe8",
+  "tags": []
+}
