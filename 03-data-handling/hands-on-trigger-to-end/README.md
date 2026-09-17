@@ -18,9 +18,15 @@ Trace exactly how a single piece of data travels through an entire workflow — 
 
 **The key insight:** by the time data reaches the Gmail node, `$json` only contains what the LLM Chain output (`text`) — the original email address and topic are no longer in the "current" item. The subject line still needs the topic though, which is only possible because n8n lets you reference an earlier node by name (`$('On form submission')`) instead of only the item directly before you. This is the clearest real example of why `$node`/`$('NodeName')` referencing (see [expressions-and-variables.md](../expressions-and-variables.md)) exists — a straight linear chain can still lose data it needs later unless you explicitly reach back for it.
 
+## 🖼️ Preview
+
+Architecture of the workflow as built in n8n:
+
+![n8n workflow architecture](./screenshot.png)
+
 ## 🗂️ Files
 - `workflow.json` — full exported workflow, importable via **n8n → Workflows → Import from File**
-- `screenshot.png` — *(add canvas + a successful execution log, showing the item data at each step)*
+- `screenshot.png` — canvas screenshot showing the full node layout and connections
 
 ## 🐛 What Broke / Lessons
 - Pulling the topic into the email subject required referencing the trigger node by name (`$('On form submission')`) rather than `$json`, since the LLM Chain's output had already replaced the current item's fields.
