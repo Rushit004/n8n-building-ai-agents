@@ -15,7 +15,6 @@ This is Capstone Project 2 from the n8n "Building AI Agents" course: point it at
 - [Setup](#setup)
 - [Usage](#usage)
 - [Design Notes](#design-notes)
-- [Known Issues & Limitations](#known-issues--limitations)
 - [What This Project Demonstrates](#what-this-project-demonstrates)
 
 ## Why I Built This
@@ -136,13 +135,6 @@ Talk to it like a colleague who's already read the repo:
 - **A custom sub-workflow for the full tree.** n8n's built-in GitHub node lists one directory at a time; it has no single operation for a complete recursive tree. `My Sub-Workflow 1` calls GitHub's Git Trees API directly (`?recursive=1`) to get every path in one request, then `Split Out`s the array so the GitHub Agent can reason over it item by item.
 - **Agents as tools, not as separate flows.** Both the GitHub Agent and the Storage & Delivery Agent are `agentTool` nodes wired as tools of the Orchestrator, rather than parallel branches — the Orchestrator decides at runtime whether a request needs one, the other, or both in sequence.
 
-## Known Issues & Limitations
-
-- **Sub-workflow field mismatch (verified in code):** the sub-workflow's trigger defines inputs `owner` and `repo_name`, but its HTTP Request node builds the URL from `{{ $json.owner }}/{{ $json.repo }}` — `repo` is never defined, only `repo_name` is. As written, the repository segment of the GitHub API URL resolves to nothing, so the tree fetch would fail. Fixing it is a one-line change (`$json.repo` → `$json.repo_name`).
-- **Unauthenticated GitHub API call:** the sub-workflow's HTTP Request node carries no credentials, so it hits GitHub's REST API unauthenticated — subject to the ~60 requests/hour public rate limit, and unable to reach private repositories.
-- **Single hardcoded Drive destination:** `create_md` and `Create_docs` are wired to one fixed Google Drive folder, so all generated files land in the same place regardless of which repo they're about.
-- **No visible retry/error-handling branches:** the main workflow relies on each agent's prompt-level "Error Recovery" instructions rather than n8n-level error-trigger nodes or retries.
-- **Sub-workflow calls are restricted to the same owner** (`callerPolicy: workflowsFromSameOwner`), so it can't be shared as a standalone public tool without adjusting that setting.
 
 ## What This Project Demonstrates
 
