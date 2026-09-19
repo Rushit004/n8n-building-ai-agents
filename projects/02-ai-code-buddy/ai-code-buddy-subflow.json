@@ -1,0 +1,92 @@
+{
+  "name": "ai-code-buddy-subflow",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "owner"
+            },
+            {
+              "name": "repo_name"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        32,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/{{ $json.owner }}/{{ $json.repo }}/git/trees/HEAD?recursive=1",
+        "options": {}
+      },
+      "id": "3cfaecaa-a97d-4271-a74c-867d0dd2c8aa",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tree",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        448,
+        160
+      ],
+      "id": "f20a972c-f015-4286-b68e-168b344cddcc",
+      "name": "Split Out"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "62cc112b-c101-4e44-86f8-915c1a096f85",
+  "meta": {
+    "instanceId": "REDACTED"
+  },
+  "nodeGroups": [],
+  "id": "8oy3xUXln4KCXglR",
+  "tags": []
+}
