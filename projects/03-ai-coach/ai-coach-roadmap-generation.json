@@ -1,0 +1,291 @@
+{
+  "name": "ai-coach-roadmap-generation",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Goal\n\n- Provide topic to the workflow.\n- Builds up a roadmap for you.\n- List of topics → Beginner, Intermediate, Advanced.\n\n## Flow\n\nForm → Flow → Roadmap → HTML convert → Send the roadmap as mail",
+        "height": 256,
+        "width": 352
+      },
+      "id": "d8809406-0e63-4fa7-9a3e-ca1abf45be56",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Ai Learning Coach - Get Your Personalized Roadmap",
+        "formDescription": "Tell us what you want to learn and we will provide detailed learning path for you!",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Topic name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Current Expertise ",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Beginner "
+                  },
+                  {
+                    "option": "Intermediate "
+                  },
+                  {
+                    "option": "Advance"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target Level",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Beginner "
+                  },
+                  {
+                    "option": "Intermediate "
+                  },
+                  {
+                    "option": "Advance"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Time Commitment(hrs/day)",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Duration to complete (in weeks )",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Days Per Week(5days Per week)",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Primary Goal",
+              "fieldType": "checkbox",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Exam"
+                  },
+                  {
+                    "option": "Job"
+                  },
+                  {
+                    "option": "Internship"
+                  },
+                  {
+                    "option": "Project"
+                  },
+                  {
+                    "option": "Interview "
+                  },
+                  {
+                    "option": "General Learning"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "buttonLabel": "Generate My Roadmap"
+        }
+      },
+      "id": "a05e0864-4d05-4729-8175-dc6726cdcc58",
+      "name": "On form submission",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a personalized and comprehensive learning roadmap for me.\n\n## My Learning Requirements\n\n* **Topic / Skill:** {{ $json['Topic name'] }}\n* **Current Skill Level:** {{ $json['Current Expertise '] }}\n* **Target Level:** {{ $json['Target Level'] }}\n* **Duration:** {{ $json['Duration to complete (in weeks )'] }}\n* **Time Commitment:** {{ $json['Time Commitment(hrs/day)'] }}\n* **Days Per Week:** {{ $json['Days Per Week(5days Per week)'] }}\n* **Primary Goal:** {{ $json['Primary Goal'][0] }}\n* **Deadline:** [Optional]\n* **Tools / Technologies Available:** [Optional]\n* **Constraints:** [Optional]\n\n## What I Want\n\nCreate a **structured, realistic, and comprehensive roadmap** that fits my available time and current skill level.\n\nThe roadmap should include:\n\n1. A clear overall learning goal.\n2. An assessment of my starting point.\n3. A logical progression from prerequisites to advanced concepts.\n4. A week-by-week breakdown.\n5. A day-by-day schedule when appropriate.\n6. Topics and subtopics for every stage.\n7. Estimated time for each activity.\n8. Theory + practical learning.\n9. Exercises and practice tasks.\n10. Mini-projects and a final project where relevant.\n11. Milestones with measurable outcomes.\n12. Revision and review sessions.\n13. Assessments/checkpoints to determine whether I am ready to move forward.\n14. Recommended resources.\n15. A final outcome describing what I should be able to do after completing the roadmap.\n\n## Important Requirements\n\n* Do not overload the schedule.\n* Keep the roadmap achievable within my stated duration and time commitment.\n* Prioritize concepts based on importance and prerequisites.\n* Adapt the difficulty to my current skill level.\n* Do not assume I know concepts that I have not mentioned.\n* Do not spend excessive time on concepts I already know.\n* Include practical work wherever possible.\n* Clearly separate learning, practice, projects, and revision.\n* If my goal cannot realistically be achieved within the given duration, explain the limitation and provide the most realistic roadmap possible.\n* If essential information is missing, ask only the necessary clarification questions.\n\n## Output Requirement\n\nReturn the complete roadmap in **clean, professional Markdown**.\n\nUse:\n\n* Headings\n* Tables\n* Checklists\n* Bullet points\n* Code blocks only when technically necessary\n\nMake the roadmap easy to follow and execute without requiring additional planning from me.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "# Role\n\nYou are an expert **Learning Roadmap Architect and Technical Mentor**. Your job is to create practical, structured, personalized learning roadmaps that take a learner from their current skill level to a clearly defined target within a specified time period.\n\n## Core Objective\n\nGenerate a **comprehensive, realistic, and structured learning roadmap** based on:\n\n* **Topic / Skill:** What the user wants to learn\n* **Current Skill Level:** Beginner, Intermediate, Advanced, or Unknown\n* **Target Level / Goal:** What the learner wants to achieve\n* **Time Commitment:** Hours available per day or week\n* **Duration:** Total learning period, such as 4 weeks, 8 weeks, or 3 months\n* **Learning Preferences:** Theory, practical projects, exercises, videos, reading, etc.\n* **Existing Knowledge:** Concepts the learner already knows\n* **Constraints:** Exams, deadlines, tools, hardware, prerequisites, etc.\n\n## Roadmap Generation Rules\n\n### 1. Assess the Learner\n\nFirst understand the learner's starting point.\n\nIf the user provides their skill level, use it directly.\n\nIf the skill level is unclear, infer it only when there is enough evidence. Otherwise, clearly state the assumption or ask for the missing information.\n\nDo not teach concepts the learner already knows unless they are important prerequisites.\n\n### 2. Build a Logical Learning Sequence\n\nOrganize topics from:\n\n**Prerequisites → Fundamentals → Core Concepts → Intermediate Concepts → Advanced Concepts → Practical Application → Project → Review**\n\nDo not simply create a list of topics.\n\nExplain why each stage exists and how it connects to the next stage.\n\n### 3. Respect Time Constraints\n\nCalculate the approximate available learning time.\n\nFor example:\n\n`Hours per day × Learning days per week × Number of weeks`\n\nEnsure the roadmap is realistically achievable within the user's available time.\n\nDo not overload a day with too many concepts.\n\nInclude buffer/revision time where appropriate.\n\n### 4. Create a Week-by-Week Plan\n\nFor multi-week roadmaps, divide the learning journey into clearly defined weeks.\n\nEach week should contain:\n\n* Main objective\n* Topics\n* Subtopics\n* Practical work\n* Exercises\n* Revision\n* Expected outcome\n\n### 5. Create a Day-by-Day Plan When Appropriate\n\nFor shorter roadmaps or when the user provides daily availability, provide a daily schedule.\n\nEach day should have:\n\n* Learning topic\n* Concepts to understand\n* Practical task\n* Practice/exercise\n* Estimated time\n* Completion goal\n\n### 6. Balance Theory and Practice\n\nFollow a practical learning approach.\n\nPrefer:\n\n**Learn → Practice → Build → Review**\n\nAvoid creating roadmaps that are only theoretical.\n\nInclude coding exercises, problems, mini-projects, experiments, or real-world tasks when relevant to the subject.\n\n### 7. Include Projects\n\nProjects should gradually increase in difficulty.\n\nUse:\n\n* Mini projects for fundamentals\n* Intermediate projects for combining concepts\n* A final project that demonstrates the skills learned\n\nProjects must be realistic for the user's available time.\n\n### 8. Include Milestones\n\nDefine measurable milestones throughout the roadmap.\n\nExamples:\n\n* \"Can explain...\"\n* \"Can implement...\"\n* \"Can solve...\"\n* \"Can build...\"\n* \"Can debug...\"\n* \"Can independently complete...\"\n\nAvoid vague milestones such as \"Understand Python.\"\n\n### 9. Include Assessment\n\nAdd checkpoints such as:\n\n* Quiz questions\n* Practice problems\n* Coding tasks\n* Mini projects\n* Self-assessment\n* Final project\n\nThe learner should be able to determine whether they are ready to move forward.\n\n### 10. Handle Missing Information\n\nIf important information is missing, do not invent specific user details.\n\nAsk concise clarification questions when the missing information significantly affects the roadmap.\n\nIf the missing information has a reasonable default, state the assumption and continue.\n\n## Output Format\n\nAlways return the roadmap in clean, professional **Markdown**.\n\nUse this structure when applicable:\n\n# Learning Roadmap: [Topic]\n\n## 🎯 Goal\n\nClearly describe what the learner should be able to do by the end.\n\n## 📊 Learner Profile\n\n| Factor                | Details |\n| --------------------- | ------- |\n| Current Level         | ...     |\n| Target Level          | ...     |\n| Duration              | ...     |\n| Time Commitment       | ...     |\n| Total Estimated Hours | ...     |\n| Learning Style        | ...     |\n\n## 🗺️ Roadmap Overview\n\nProvide the complete progression:\n\n`Stage 1 → Stage 2 → Stage 3 → Stage 4 → Final Project`\n\n## 📅 Week 1 — [Title]\n\n### Objectives\n\n* ...\n\n### Topics\n\n* ...\n\n### Practice\n\n* ...\n\n### Project / Task\n\n* ...\n\n### Milestone\n\n* ...\n\nRepeat for every week.\n\n## 🕐 Daily Schedule\n\nUse a table when a daily breakdown is appropriate:\n\n| Day | Topic | Theory | Practice | Task | Time |\n| --- | ----- | -----: | -------: | ---- | ---: |\n\n## 🛠️ Projects\n\nDescribe projects with:\n\n* Project name\n* Difficulty\n* Concepts used\n* Expected outcome\n* Suggested features\n\n## 🧪 Assessment & Checkpoints\n\nInclude measurable tests for each major stage.\n\n## 📚 Resources\n\nRecommend appropriate types of resources and, when reliable resources are available, provide links.\n\nPrioritize high-quality and relevant resources over quantity.\n\n## ✅ Final Outcome\n\nClearly state what the learner should be capable of doing after completing the roadmap.\n\n## 🔄 Revision Strategy\n\nInclude a practical strategy for retaining previously learned concepts.\n\n## Rules for Quality\n\n* Be comprehensive but not unnecessarily verbose.\n* Prioritize important concepts over exhaustive topic lists.\n* Never create an unrealistic schedule.\n* Adapt difficulty to the learner's current level.\n* Avoid unnecessary repetition.\n* Use consistent Markdown formatting.\n* Make every task actionable.\n* Prefer measurable outcomes.\n* Clearly distinguish **learning**, **practice**, **projects**, and **revision**.\n* If the requested duration is too short for the requested goal, explicitly state the limitation and create the most realistic achievable version.\n* If the user wants only a specific Markdown format, follow their requested format exactly.\n* Do not claim the learner has mastered something merely because it appears in the roadmap.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "8d255f2a-544f-4093-ac14-39b498bf19d7",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        224,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 2000,
+          "temperature": 0.6
+        }
+      },
+      "id": "a8e5a025-770c-4737-a34a-96f99691d6d7",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        576
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function markdownToHtml(markdown) {\n\n    if (!markdown) {\n        return '';\n    }\n\n    // Normalize line endings\n    let html = markdown\n        .replace(/\\r\\n/g, '\\n')\n        .replace(/\\r/g, '\\n')\n        .trim();\n\n    // Escape HTML characters\n    html = html\n        .replace(/&/g, '&amp;')\n        .replace(/</g, '&lt;')\n        .replace(/>/g, '&gt;');\n\n    // --------------------------------------------------\n    // CODE BLOCKS\n    // --------------------------------------------------\n\n    html = html.replace(\n        /```(\\w+)?\\n([\\s\\S]*?)```/g,\n        function(match, language, code) {\n\n            const lang = language\n                ? ` class=\"language-${language}\"`\n                : '';\n\n            return `<pre><code${lang}>${code.trim()}</code></pre>`;\n        }\n    );\n\n    // --------------------------------------------------\n    // HEADINGS\n    // --------------------------------------------------\n\n    html = html\n        .replace(/^###### (.*)$/gm, '<h6>$1</h6>')\n        .replace(/^##### (.*)$/gm, '<h5>$1</h5>')\n        .replace(/^#### (.*)$/gm, '<h4>$1</h4>')\n        .replace(/^### (.*)$/gm, '<h3>$1</h3>')\n        .replace(/^## (.*)$/gm, '<h2>$1</h2>')\n        .replace(/^# (.*)$/gm, '<h1>$1</h1>');\n\n    // --------------------------------------------------\n    // HORIZONTAL RULE\n    // --------------------------------------------------\n\n    html = html.replace(\n        /^(\\*\\*\\*|---|___)$/gm,\n        '<hr>'\n    );\n\n    // --------------------------------------------------\n    // BLOCKQUOTES\n    // --------------------------------------------------\n\n    html = html.replace(\n        /^> (.*)$/gm,\n        '<blockquote>$1</blockquote>'\n    );\n\n    // --------------------------------------------------\n    // CHECKBOXES\n    // --------------------------------------------------\n\n    html = html.replace(\n        /^- \\[x\\] (.*)$/gim,\n        '<li><input type=\"checkbox\" checked disabled> $1</li>'\n    );\n\n    html = html.replace(\n        /^- \\[ \\] (.*)$/gm,\n        '<li><input type=\"checkbox\" disabled> $1</li>'\n    );\n\n    // --------------------------------------------------\n    // LINKS\n    // --------------------------------------------------\n\n    html = html.replace(\n        /\\[([^\\]]+)\\]\\((https?:\\/\\/[^\\s)]+)\\)/g,\n        '<a href=\"$2\" target=\"_blank\" rel=\"noopener noreferrer\">$1</a>'\n    );\n\n    // --------------------------------------------------\n    // IMAGES\n    // --------------------------------------------------\n\n    html = html.replace(\n        /!\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+)\\)/g,\n        '<img src=\"$2\" alt=\"$1\">'\n    );\n\n    // --------------------------------------------------\n    // INLINE CODE\n    // --------------------------------------------------\n\n    html = html.replace(\n        /`([^`]+)`/g,\n        '<code>$1</code>'\n    );\n\n    // --------------------------------------------------\n    // BOLD + ITALIC\n    // --------------------------------------------------\n\n    html = html.replace(\n        /\\*\\*\\*(.*?)\\*\\*\\*/g,\n        '<strong><em>$1</em></strong>'\n    );\n\n    html = html.replace(\n        /___(.*?)___/g,\n        '<strong><em>$1</em></strong>'\n    );\n\n    // Bold\n    html = html.replace(\n        /\\*\\*(.*?)\\*\\*/g,\n        '<strong>$1</strong>'\n    );\n\n    html = html.replace(\n        /__(.*?)__/g,\n        '<strong>$1</strong>'\n    );\n\n    // Italic\n    html = html.replace(\n        /(?<!\\*)\\*([^*\\n]+)\\*(?!\\*)/g,\n        '<em>$1</em>'\n    );\n\n    html = html.replace(\n        /(?<!_)_([^_\\n]+)_(?!_)/g,\n        '<em>$1</em>'\n    );\n\n    // --------------------------------------------------\n    // NUMBERED LISTS\n    // --------------------------------------------------\n\n    html = html.replace(\n        /(?:^|\\n)((?:\\d+\\. .+(?:\\n|$))+)/g,\n        function(match, list) {\n\n            const items = list\n                .trim()\n                .split('\\n')\n                .map(item => {\n                    return item.replace(\n                        /^\\d+\\. (.*)$/,\n                        '<li>$1</li>'\n                    );\n                })\n                .join('');\n\n            return `\\n<ol>${items}</ol>\\n`;\n        }\n    );\n\n    // --------------------------------------------------\n    // BULLET LISTS\n    // --------------------------------------------------\n\n    html = html.replace(\n        /(?:^|\\n)((?:[-*+] .+(?:\\n|$))+)/g,\n        function(match, list) {\n\n            const items = list\n                .trim()\n                .split('\\n')\n                .map(item => {\n                    return item.replace(\n                        /^[-*+] (.*)$/,\n                        '<li>$1</li>'\n                    );\n                })\n                .join('');\n\n            return `\\n<ul>${items}</ul>\\n`;\n        }\n    );\n\n    // --------------------------------------------------\n    // TABLES\n    // --------------------------------------------------\n\n    html = html.replace(\n        /((?:^\\|.*\\|$\\n?)+)/gm,\n        function(match) {\n\n            const lines = match\n                .trim()\n                .split('\\n');\n\n            if (lines.length < 2) {\n                return match;\n            }\n\n            // Check whether second row is table separator\n            if (!/^\\|?\\s*:?-+:?\\s*(\\|\\s*:?-+:?\\s*)+\\|?$/.test(lines[1])) {\n                return match;\n            }\n\n            const headers = lines[0]\n                .replace(/^\\||\\|$/g, '')\n                .split('|')\n                .map(x => x.trim());\n\n            let table = '<table><thead><tr>';\n\n            headers.forEach(header => {\n                table += `<th>${header}</th>`;\n            });\n\n            table += '</tr></thead><tbody>';\n\n            for (let i = 2; i < lines.length; i++) {\n\n                const cells = lines[i]\n                    .replace(/^\\||\\|$/g, '')\n                    .split('|')\n                    .map(x => x.trim());\n\n                table += '<tr>';\n\n                cells.forEach(cell => {\n                    table += `<td>${cell}</td>`;\n                });\n\n                table += '</tr>';\n            }\n\n            table += '</tbody></table>';\n\n            return table;\n        }\n    );\n\n    // --------------------------------------------------\n    // PARAGRAPHS\n    // --------------------------------------------------\n\n    const blocks = html.split(/\\n\\s*\\n/);\n\n    html = blocks\n        .map(block => {\n\n            block = block.trim();\n\n            if (!block) {\n                return '';\n            }\n\n            // Don't wrap existing HTML blocks\n            if (\n                block.startsWith('<h1>') ||\n                block.startsWith('<h2>') ||\n                block.startsWith('<h3>') ||\n                block.startsWith('<h4>') ||\n                block.startsWith('<h5>') ||\n                block.startsWith('<h6>') ||\n                block.startsWith('<ul>') ||\n                block.startsWith('<ol>') ||\n                block.startsWith('<pre>') ||\n                block.startsWith('<blockquote>') ||\n                block.startsWith('<table>') ||\n                block.startsWith('<hr>')\n            ) {\n                return block;\n            }\n\n            return `<p>${block}</p>`;\n        })\n        .join('\\n');\n\n    // --------------------------------------------------\n    // SINGLE LINE BREAKS\n    // --------------------------------------------------\n\n    html = html.replace(\n        /(?<!>)\\n(?!<)/g,\n        '<br>'\n    );\n\n    return html;\n}\n\n\n// ======================================================\n// n8n INPUT / OUTPUT\n// ======================================================\n\nreturn $input.all().map(item => {\n\n    const markdown = item.json.text || '';\n\n    const html = markdownToHtml(markdown);\n\n    return {\n        json: {\n            ...item.json,\n            html: html\n        }\n    };\n\n});"
+      },
+      "id": "42105990-7430-4341-879d-cc9607f7fdff",
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "=🗺️ Learning Roadmap : {{ $('On form submission').item.json['Topic name'] }}",
+        "message": "={{ $json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        368
+      ],
+      "id": "b51972d9-cba3-4028-9cdd-313606c7ebac",
+      "name": "Send a message",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Code in JavaScript": [
+      {
+        "json": {
+          "text": "# Learning Roadmap: Model Context Protocol\n\n## 🎯 Goal\n\nBy the end of this roadmap, you will be able to understand and apply the Model Context Protocol at an intermediate level, enabling you to leverage it in job-related scenarios.\n\n## 📊 Learner Profile\n\n| Factor                | Details                     |\n| --------------------- | --------------------------- |\n| Current Level         | Beginner                    |\n| Target Level          | Intermediate                |\n| Duration              | 4 weeks                     |\n| Time Commitment       | 2 hours per day, 5 days a week |\n| Total Estimated Hours | 40 hours                    |\n| Learning Style        | Theory + Practical          |\n\n## 🗺️ Roadmap Overview\n\n`Prerequisites → Fundamentals → Core Concepts → Intermediate Concepts → Practical Application → Project`\n\n## 📅 Week 1 — Introduction and Fundamentals\n\n### Objectives\n\n* Understand the basics and prerequisites of Model Context Protocol.\n\n### Topics\n\n* Overview of Model Context Protocol\n* Importance in modern applications\n* Basic terminology and concepts\n\n### Practice\n\n* Create a glossary of key terms\n* Identify real-world applications\n\n### Milestone\n\n* Can explain the basic purpose and components of the Model Context Protocol.\n\n## 📅 Week 2 — Core Concepts\n\n### Objectives\n\n* Dive deeper into the core workings of the Model Context Protocol.\n\n### Topics\n\n* Data modeling concepts\n* Contextual relationships\n* Protocol operations\n\n### Practice\n\n* Diagram simple data models\n* Map contextual relationships in a hypothetical scenario\n\n### Milestone\n\n* Can create and explain simple data models and their contextual relationships.\n\n## 📅 Week 3 — Intermediate Concepts\n\n### Objectives\n\n* Develop a more nuanced understanding of the protocol's intermediate concepts.\n\n### Topics\n\n* Advanced data modeling\n* Integration with existing systems\n* Security and performance considerations\n\n### Practice\n\n* Modify existing models to include advanced features\n* Conduct a mock integration with a sample system\n\n### Milestone\n\n* Can modify and integrate data models with consideration for security and performance.\n\n## 📅 Week 4 — Practical Application and Project\n\n### Objectives\n\n* Apply the learned concepts in a practical project.\n\n### Topics\n\n* Review of all concepts\n* Final project planning and execution\n\n### Project / Task\n\n* Design and implement a small-scale application using the Model Context Protocol.\n\n### Milestone\n\n* Successfully completed a project demonstrating the application of the Model Context Protocol.\n\n## 🕐 Daily Schedule\n\n| Day | Topic                          | Theory | Practice | Task                                   | Time  |\n| --- | ------------------------------ | -----: | -------: | -------------------------------------- | ----: |\n| 1   | Overview and Terminology       | 1 hr   | 1 hr     | Create glossary                        | 2 hrs |\n| 2   | Importance and Applications    | 1 hr   | 1 hr     | Identify applications                  | 2 hrs |\n| 3   | Basic Concepts                 | 1 hr   | 1 hr     | Explore key components                 | 2 hrs |\n| 4   | Data Modeling Basics           | 1 hr   | 1 hr     | Diagram models                         | 2 hrs |\n| 5   | Contextual Relationships       | 1 hr   | 1 hr     | Map relationships                      | 2 hrs |\n| 6   | Advanced Data Modeling         | 1 hr   | 1 hr     | Modify models                          | 2 hrs |\n| 7   | Integration Techniques         | 1 hr   | 1 hr     | Conduct mock integration               | 2 hrs |\n| 8   | Security Considerations        | 1 hr   | 1 hr     | Explore security features              | 2 hrs |\n| 9   | Performance Considerations     | 1 hr   | 1 hr     | Analyze performance impact             | 2 hrs |\n| 10  | Review and Project Planning    | 1 hr   | 1 hr     | Plan final project                     | 2 hrs |\n| 11  | Project Implementation         | 2 hrs  | 0 hr     | Start coding                           | 2 hrs |\n| 12  | Project Implementation         | 2 hrs  | 0 hr     | Continue coding                        | 2 hrs |\n| 13  | Project Testing and Evaluation | 1 hr   | 1 hr     | Test and evaluate                      | 2 hrs |\n| 14  | Final Review and Adjustments   | 1 hr   | 1 hr     | Make final adjustments                 | 2 hrs |\n| 15  | Project Presentation           | 0 hr   | 2 hrs    | Present project                        | 2 hrs |\n\n## 🛠️ Projects\n\n### Final Project\n\n* **Project Name:** Contextual Data Application\n* **Difficulty:** Intermediate\n* **Concepts Used:** Data modeling, integration, security\n* **Expected Outcome:** A functioning application demonstrating the Model Context Protocol\n* **Suggested Features:** User authentication, data visualization, real-time updates\n\n## 🧪 Assessment & Checkpoints\n\n* Weekly quizzes on key concepts\n* Practical tasks completion\n* Midway review session with self-assessment questions\n* Final project evaluation\n\n## 📚 Resources\n\n* **Books:** \"Designing Data-Intensive Applications\" by Martin Kleppmann\n* **Online Courses:** Coursera, Udemy courses on data modeling and protocols\n* **Articles:** Medium, Dev.to articles on Model Context Protocol\n* **Videos:** YouTube tutorials and lectures\n\n## ✅ Final Outcome\n\nYou will be capable of designing, implementing, and integrating applications using the Model Context Protocol at an intermediate level.\n\n## 🔄 Revision Strategy\n\n* Weekly review sessions\n* Create summary notes of key concepts\n* Practice coding exercises regularly\n\nThis roadmap provides a structured and achievable path to mastering the Model Context Protocol within your specified constraints. Adjustments can be made based on your progress and understanding.",
+          "html": "<h1>Learning Roadmap: Model Context Protocol</h1>\n<h2>🎯 Goal</h2>\n<p>By the end of this roadmap, you will be able to understand and apply the Model Context Protocol at an intermediate level, enabling you to leverage it in job-related scenarios.</p>\n<h2>📊 Learner Profile</h2>\n<table><thead><tr><th>Factor</th><th>Details</th></tr></thead><tbody><tr><td>Current Level</td><td>Beginner</td></tr><tr><td>Target Level</td><td>Intermediate</td></tr><tr><td>Duration</td><td>4 weeks</td></tr><tr><td>Time Commitment</td><td>2 hours per day, 5 days a week</td></tr><tr><td>Total Estimated Hours</td><td>40 hours</td></tr><tr><td>Learning Style</td><td>Theory + Practical</td></tr></tbody></table>\n<h2>🗺️ Roadmap Overview</h2>\n<p><code>Prerequisites → Fundamentals → Core Concepts → Intermediate Concepts → Practical Application → Project</code></p>\n<h2>📅 Week 1 — Introduction and Fundamentals</h2>\n<h3>Objectives</h3>\n<ul><li>Understand the basics and prerequisites of Model Context Protocol.</li></ul>\n<h3>Topics</h3>\n<ul><li>Overview of Model Context Protocol</li><li>Importance in modern applications</li><li>Basic terminology and concepts</li></ul>\n<h3>Practice</h3>\n<ul><li>Create a glossary of key terms</li><li>Identify real-world applications</li></ul>\n<h3>Milestone</h3>\n<ul><li>Can explain the basic purpose and components of the Model Context Protocol.</li></ul>\n<h2>📅 Week 2 — Core Concepts</h2>\n<h3>Objectives</h3>\n<ul><li>Dive deeper into the core workings of the Model Context Protocol.</li></ul>\n<h3>Topics</h3>\n<ul><li>Data modeling concepts</li><li>Contextual relationships</li><li>Protocol operations</li></ul>\n<h3>Practice</h3>\n<ul><li>Diagram simple data models</li><li>Map contextual relationships in a hypothetical scenario</li></ul>\n<h3>Milestone</h3>\n<ul><li>Can create and explain simple data models and their contextual relationships.</li></ul>\n<h2>📅 Week 3 — Intermediate Concepts</h2>\n<h3>Objectives</h3>\n<ul><li>Develop a more nuanced understanding of the protocol's intermediate concepts.</li></ul>\n<h3>Topics</h3>\n<ul><li>Advanced data modeling</li><li>Integration with existing systems</li><li>Security and performance considerations</li></ul>\n<h3>Practice</h3>\n<ul><li>Modify existing models to include advanced features</li><li>Conduct a mock integration with a sample system</li></ul>\n<h3>Milestone</h3>\n<ul><li>Can modify and integrate data models with consideration for security and performance.</li></ul>\n<h2>📅 Week 4 — Practical Application and Project</h2>\n<h3>Objectives</h3>\n<ul><li>Apply the learned concepts in a practical project.</li></ul>\n<h3>Topics</h3>\n<ul><li>Review of all concepts</li><li>Final project planning and execution</li></ul>\n<h3>Project / Task</h3>\n<ul><li>Design and implement a small-scale application using the Model Context Protocol.</li></ul>\n<h3>Milestone</h3>\n<ul><li>Successfully completed a project demonstrating the application of the Model Context Protocol.</li></ul>\n<h2>🕐 Daily Schedule</h2>\n<table><thead><tr><th>Day</th><th>Topic</th><th>Theory</th><th>Practice</th><th>Task</th><th>Time</th></tr></thead><tbody><tr><td>1</td><td>Overview and Terminology</td><td>1 hr</td><td>1 hr</td><td>Create glossary</td><td>2 hrs</td></tr><tr><td>2</td><td>Importance and Applications</td><td>1 hr</td><td>1 hr</td><td>Identify applications</td><td>2 hrs</td></tr><tr><td>3</td><td>Basic Concepts</td><td>1 hr</td><td>1 hr</td><td>Explore key components</td><td>2 hrs</td></tr><tr><td>4</td><td>Data Modeling Basics</td><td>1 hr</td><td>1 hr</td><td>Diagram models</td><td>2 hrs</td></tr><tr><td>5</td><td>Contextual Relationships</td><td>1 hr</td><td>1 hr</td><td>Map relationships</td><td>2 hrs</td></tr><tr><td>6</td><td>Advanced Data Modeling</td><td>1 hr</td><td>1 hr</td><td>Modify models</td><td>2 hrs</td></tr><tr><td>7</td><td>Integration Techniques</td><td>1 hr</td><td>1 hr</td><td>Conduct mock integration</td><td>2 hrs</td></tr><tr><td>8</td><td>Security Considerations</td><td>1 hr</td><td>1 hr</td><td>Explore security features</td><td>2 hrs</td></tr><tr><td>9</td><td>Performance Considerations</td><td>1 hr</td><td>1 hr</td><td>Analyze performance impact</td><td>2 hrs</td></tr><tr><td>10</td><td>Review and Project Planning</td><td>1 hr</td><td>1 hr</td><td>Plan final project</td><td>2 hrs</td></tr><tr><td>11</td><td>Project Implementation</td><td>2 hrs</td><td>0 hr</td><td>Start coding</td><td>2 hrs</td></tr><tr><td>12</td><td>Project Implementation</td><td>2 hrs</td><td>0 hr</td><td>Continue coding</td><td>2 hrs</td></tr><tr><td>13</td><td>Project Testing and Evaluation</td><td>1 hr</td><td>1 hr</td><td>Test and evaluate</td><td>2 hrs</td></tr><tr><td>14</td><td>Final Review and Adjustments</td><td>1 hr</td><td>1 hr</td><td>Make final adjustments</td><td>2 hrs</td></tr><tr><td>15</td><td>Project Presentation</td><td>0 hr</td><td>2 hrs</td><td>Present project</td><td>2 hrs</td></tr></tbody></table>\n<h2>🛠️ Projects</h2>\n<h3>Final Project</h3>\n<ul><li><strong>Project Name:</strong> Contextual Data Application</li><li><strong>Difficulty:</strong> Intermediate</li><li><strong>Concepts Used:</strong> Data modeling, integration, security</li><li><strong>Expected Outcome:</strong> A functioning application demonstrating the Model Context Protocol</li><li><strong>Suggested Features:</strong> User authentication, data visualization, real-time updates</li></ul>\n<h2>🧪 Assessment &amp; Checkpoints</h2>\n<ul><li>Weekly quizzes on key concepts</li><li>Practical tasks completion</li><li>Midway review session with self-assessment questions</li><li>Final project evaluation</li></ul>\n<h2>📚 Resources</h2>\n<ul><li><strong>Books:</strong> \"Designing Data-Intensive Applications\" by Martin Kleppmann</li><li><strong>Online Courses:</strong> Coursera, Udemy courses on data modeling and protocols</li><li><strong>Articles:</strong> Medium, Dev.to articles on Model Context Protocol</li><li><strong>Videos:</strong> YouTube tutorials and lectures</li></ul>\n<h2>✅ Final Outcome</h2>\n<p>You will be capable of designing, implementing, and integrating applications using the Model Context Protocol at an intermediate level.</p>\n<h2>🔄 Revision Strategy</h2>\n<ul><li>Weekly review sessions</li><li>Create summary notes of key concepts</li><li>Practice coding exercises regularly</li></ul>\n<p>This roadmap provides a structured and achievable path to mastering the Model Context Protocol within your specified constraints. Adjustments can be made based on your progress and understanding.</p>"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "69cc81c8-c0a3-4336-b495-7abfa31e61d4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED"
+  },
+  "nodeGroups": [],
+  "id": "X2ZpNMaXWwO8ev8d",
+  "tags": []
+}

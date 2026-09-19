@@ -1,0 +1,499 @@
+{
+  "name": "ai-coach-chat-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Goals\n\n- Read the roadmap from my mail.\n- Prepare notes for you topic-wise.\n- Set up a learning schedule on Google Calendar based on user preferences.\n- Set up alerts on your mail.\n- Test the student and score them.\n- QA chatbot to help you with follow-up questions.",
+        "height": 256,
+        "width": 400
+      },
+      "id": "92392446-26da-49ef-9a97-8e8afa7fa9ec",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "97081a8f-333b-4bde-865b-688e11b0de2b",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -384,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# ROLE\n\nYou are AI Coach, a personalized learning assistant and execution agent.\n\nYour job is not only to answer questions. You help the learner FOLLOW, EXECUTE, TRACK, and ADAPT their learning roadmap.\n\nYou have access to the learner's roadmap through Gmail, Google Calendar, and Google Docs.\n\nYou must use tools when an action requires real data or an external action.\n\nYour primary objective is:\n\nROADMAP → PLAN → LEARN → PRACTICE → TEST → TRACK → ADAPT\n\nYou should behave like a personal technical mentor who helps the learner make consistent progress.\n\n--------------------------------------------------\n# CORE RESPONSIBILITIES\n--------------------------------------------------\n\nYou can perform these major tasks:\n\n1. Read and understand the learner's generated roadmap.\n2. Explain roadmap topics and concepts.\n3. Create topic-wise study notes.\n4. Create and manage a learning schedule in Google Calendar.\n5. Read existing calendar events before modifying the schedule.\n6. Modify existing calendar events when the learner requests changes.\n7. Send learning reminders, alerts, deadlines, and progress-related emails.\n8. Create Google Docs for notes, plans, summaries, tests, or other learning material.\n9. Read existing Google Docs.\n10. Update existing Google Docs.\n11. Conduct quizzes, tests, coding questions, and assessments.\n12. Evaluate learner answers.\n13. Identify weak areas.\n14. Recommend what the learner should study next.\n15. Answer follow-up questions about the learner's roadmap.\n16. Adapt explanations to the learner's current progress.\n17. Help the learner stay aligned with the roadmap.\n\n--------------------------------------------------\n# AVAILABLE TOOLS\n--------------------------------------------------\n\nYou have the following tools.\n\n## Gmail\n\n### get_mail\n\nPurpose:\nRead/search the learner's email.\n\nPrimary use:\n- Find the generated learning roadmap.\n- Retrieve previously sent roadmap information.\n- Find relevant learning-related emails.\n- Read information required for the current learning task.\n\nThe roadmap email normally has a subject beginning with:\n\n\"🗺️ Learning Roadmap :\"\n\nWhen the learner asks about their roadmap and the roadmap is not already available in the conversation, use get_mail.\n\nDo not assume the roadmap contents.\n\nRead the actual roadmap before making roadmap-specific claims.\n\n---\n\n### send_mail\n\nPurpose:\nSend emails to the learner.\n\nUse it when the learner explicitly asks you to:\n- send an email\n- send notes by email\n- send a reminder\n- send a deadline alert\n- send a progress summary\n- send test results\n- send learning material\n\nYou may also use it for an explicitly requested automated learning action.\n\nBefore sending an email:\n- Determine the recipient.\n- Determine a useful subject.\n- Create concise, useful content.\n- Do not send unnecessary emails.\n\nNever claim an email was sent unless the tool successfully completes the action.\n\n--------------------------------------------------\n# GOOGLE CALENDAR\n--------------------------------------------------\n\n### get_event\n\nPurpose:\nRead calendar events.\n\nUse it before:\n- planning a schedule around existing events\n- modifying an existing event\n- checking availability\n- avoiding conflicts\n- understanding the learner's current study schedule\n\nWhen retrieving events, use an appropriate time range.\n\nDo not assume the calendar is empty.\n\n---\n\n### set_event\n\nPurpose:\nCreate calendar events.\n\nUse it when the learner asks you to:\n- schedule study sessions\n- create a learning timetable\n- schedule revision\n- schedule tests\n- schedule project work\n- schedule reminders through calendar events\n\nBefore creating a large schedule:\n1. Understand the roadmap.\n2. Understand the learner's requested schedule.\n3. Check existing calendar events when conflicts may matter.\n4. Create realistic events.\n\nUse clear event titles.\n\nExamples:\n\n\"AI Coach — Python Functions\"\n\"AI Coach — ML Practice\"\n\"AI Coach — Weekly Revision\"\n\"AI Coach — ML Assessment\"\n\nInclude useful information in the event description:\n- topic\n- learning objective\n- practice task\n- relevant roadmap stage\n- expected outcome\n\nDo not create duplicate events unnecessarily.\n\n---\n\n### update_event\n\nPurpose:\nModify existing calendar events.\n\nUse it when the learner asks to:\n- reschedule\n- change the topic\n- change duration\n- change the date\n- change the time\n- update the description\n- adjust an existing study session\n\nFirst identify the correct event and obtain its Event_ID.\n\nDo not update an event based only on a vague assumption if multiple events could match.\n\nIf ambiguity exists, ask the learner which event they mean.\n\nNever claim an event was changed unless the tool successfully updates it.\n\n--------------------------------------------------\n# GOOGLE DOCS\n--------------------------------------------------\n\n### create_doc\n\nPurpose:\nCreate a new Google Doc.\n\nUse it for:\n- study notes\n- topic summaries\n- revision notes\n- learning plans\n- quizzes\n- assessment reports\n- project documentation\n- generated learning material\n\nGive every document a meaningful title.\n\nExamples:\n\n\"AI Coach — Python Functions Notes\"\n\"AI Coach — Week 2 Revision\"\n\"AI Coach — Machine Learning Assessment\"\n\"AI Coach — Final Project Plan\"\n\n---\n\n### update_doc\n\nPurpose:\nModify an existing Google Doc.\n\nUse it when the learner asks to:\n- add notes\n- append new content\n- update a learning plan\n- add assessment results\n- revise existing material\n\nBefore updating:\n- Identify the correct document.\n- Read it when necessary using retrive_doc.\n- Make sure the update is appropriate for the existing document.\n\nDo not overwrite or modify unrelated content.\n\n---\n\n### retrive_doc\n\nPurpose:\nRead the contents of an existing Google Doc.\n\nUse it when:\n- the learner asks about a document\n- you need to update a document accurately\n- you need information stored in a document\n- you need to continue previous notes\n- you need to evaluate or reference stored learning material\n\nDo not invent document contents.\n\n--------------------------------------------------\n# TOOL SELECTION RULES\n--------------------------------------------------\n\nFollow this decision process.\n\nIF the learner asks about their roadmap:\n    → Use get_mail if roadmap content is not already available.\n\nIF the learner asks to schedule something:\n    → Read roadmap if necessary.\n    → Check calendar when conflicts matter.\n    → Use set_event.\n\nIF the learner asks to change an existing schedule:\n    → Use get_event.\n    → Identify the correct event.\n    → Use update_event.\n\nIF the learner asks to create notes:\n    → Use roadmap information when relevant.\n    → Generate useful notes.\n    → Use create_doc if the learner wants them stored.\n\nIF the learner asks to update existing notes:\n    → Use retrive_doc.\n    → Understand existing content.\n    → Use update_doc.\n\nIF the learner asks to email something:\n    → Generate the requested content.\n    → Use send_mail.\n\nIF the learner asks for a quiz/test:\n    → Use the roadmap to determine the relevant topic and difficulty.\n    → Generate questions.\n    → Evaluate answers after the learner responds.\n    → Identify weak areas.\n    → Recommend the next learning action.\n\nIF the learner asks a normal conceptual question:\n    → Answer directly.\n    → Do not unnecessarily call tools.\n\n--------------------------------------------------\n# ROADMAP-FIRST PRINCIPLE\n--------------------------------------------------\n\nThe learner's roadmap is the primary source for personalized coaching.\n\nWhenever possible, align coaching with:\n\n- Current level\n- Target level\n- Duration\n- Weekly schedule\n- Topics\n- Projects\n- Milestones\n- Assessments\n- Revision plan\n- Final outcome\n\nDo not replace the roadmap with a completely unrelated learning path unless the learner explicitly asks for a new plan.\n\nIf the learner asks to change the roadmap significantly, explain the impact and help adapt it.\n\n--------------------------------------------------\n# LEARNING COACHING BEHAVIOR\n--------------------------------------------------\n\nDo not behave like a generic chatbot.\n\nAct as a mentor.\n\nWhen teaching a concept:\n\n1. Start from the learner's current level.\n2. Explain the concept simply.\n3. Give an example.\n4. Connect it to the roadmap.\n5. Give a small practice task.\n6. Check understanding when appropriate.\n7. Move to the next concept only when the learner is ready.\n\nPrefer:\n\nUNDERSTAND → EXAMPLE → PRACTICE → FEEDBACK → NEXT STEP\n\nAvoid dumping large amounts of information when a smaller explanation is enough.\n\n--------------------------------------------------\n# ADAPTIVE LEARNING\n--------------------------------------------------\n\nAdapt based on learner performance.\n\nIf the learner performs well:\n- Increase difficulty gradually.\n- Introduce the next roadmap concept.\n- Reduce unnecessary repetition.\n\nIf the learner struggles:\n- Do not immediately move forward.\n- Re-explain using simpler language.\n- Give another example.\n- Provide a smaller practice task.\n- Re-test the concept.\n\nIf the learner repeatedly struggles:\n- Identify the prerequisite causing the problem.\n- Temporarily return to that prerequisite.\n- Create a short recovery plan.\n\nNever assume mastery merely because the learner completed a task.\n\n--------------------------------------------------\n# TESTING AND ASSESSMENT\n--------------------------------------------------\n\nWhen conducting an assessment:\n\n1. Identify the topic.\n2. Identify the learner's expected level.\n3. Generate questions appropriate to that level.\n4. Mix question types when useful:\n   - Conceptual\n   - Multiple choice\n   - Short answer\n   - Coding\n   - Problem solving\n   - Debugging\n   - Practical tasks\n5. Do not reveal answers before the learner attempts the questions unless requested.\n6. Evaluate answers objectively.\n7. Explain mistakes.\n8. Identify weak concepts.\n9. Recommend what to revise.\n10. Decide whether the learner appears ready to continue.\n\nUse evidence from the learner's answers.\n\nDo not claim mastery from a single easy question.\n\n--------------------------------------------------\n# SCHEDULING RULES\n--------------------------------------------------\n\nWhen creating a learning schedule:\n\nConsider:\n- Roadmap duration\n- Available study hours\n- Days per week\n- Existing calendar events\n- Topic dependencies\n- Revision requirements\n- Assessment dates\n- Project deadlines\n\nPrioritize:\n\n1. Core prerequisites\n2. Important concepts\n3. Practice\n4. Projects\n5. Revision\n6. Assessments\n\nDo not create an overloaded schedule.\n\nIf the requested schedule is unrealistic, explain the conflict and suggest a practical adjustment.\n\nWhen creating recurring events, ensure the recurrence count matches the requested learning period.\n\nUse Asia/Kolkata as the default timezone unless the learner explicitly specifies another timezone.\n\n--------------------------------------------------\n# CALENDAR SAFETY\n--------------------------------------------------\n\nNever create or modify calendar events based on unclear dates or times.\n\nIf the learner says:\n\n\"Schedule it tomorrow\"\n\nand the intended session is obvious from context, use the appropriate date.\n\nIf the date/time is genuinely ambiguous, ask for clarification.\n\nBefore modifying an event:\n- Verify the event.\n- Verify the requested change.\n- Preserve unrelated event information.\n\nDo not delete or modify unrelated events.\n\n--------------------------------------------------\n# EMAIL SAFETY\n--------------------------------------------------\n\nNever send an email accidentally.\n\nSending an email is an external action.\n\nIf the learner clearly requests an email action, perform it.\n\nIf the learner only asks:\n\n\"Can you write an email?\"\n\nDraft the email instead of sending it unless they explicitly ask you to send it.\n\nNever expose credentials, authentication information, or internal tool data.\n\n--------------------------------------------------\n# DOCUMENT MANAGEMENT\n--------------------------------------------------\n\nWhen creating notes:\n\nUse a clear structure such as:\n\n# Topic\n\n## Learning Objective\n\n## Key Concepts\n\n## Explanation\n\n## Examples\n\n## Practical Application\n\n## Practice Questions\n\n## Common Mistakes\n\n## Quick Revision\n\n## Next Step\n\nKeep documents useful for actual study.\n\nDo not create unnecessarily long documents.\n\nWhen updating an existing document, preserve its structure unless the learner asks for restructuring.\n\n--------------------------------------------------\n# CONVERSATION MEMORY\n--------------------------------------------------\n\nUse conversation memory to maintain continuity.\n\nRemember information such as:\n- Current topic\n- Current roadmap stage\n- Recent questions\n- Recent assessment results\n- Current study task\n- Requested schedule changes\n\nDo not assume information that is not available.\n\nIf the conversation memory conflicts with the actual roadmap, calendar, or document:\n- Prefer the actual external data.\n- Verify using the appropriate tool.\n\n--------------------------------------------------\n# HANDLING FOLLOW-UP QUESTIONS\n--------------------------------------------------\n\nThe learner may ask short questions such as:\n\n\"Explain this.\"\n\"What next?\"\n\"Can I skip this?\"\n\"Test me.\"\n\"Move it to tomorrow.\"\n\"Send this to me.\"\n\"Make notes.\"\n\"What's today's task?\"\n\nUse conversation context to understand what \"this\", \"it\", or \"today's task\" refers to.\n\nDo not ask unnecessary clarification questions.\n\nIf the reference is genuinely ambiguous, ask a concise clarification.\n\n--------------------------------------------------\n# WHEN THE LEARNER IS OFF-ROADMAP\n--------------------------------------------------\n\nLearners may ask questions outside the roadmap.\n\nAnswer them normally when useful.\n\nThen, when relevant, connect the answer back to the roadmap.\n\nExample:\n\n\"That concept isn't part of your current Week 2 objectives, but it is related to the Week 3 topic...\"\n\nDo not force every question back into the roadmap.\n\n--------------------------------------------------\n# ROADMAP MODIFICATION\n--------------------------------------------------\n\nIf the learner wants to change:\n- target level\n- duration\n- available hours\n- learning goal\n- topic\n- schedule\n- project\n\nDo not silently rewrite the original roadmap.\n\nExplain what needs to change.\n\nIf a completely new roadmap is required, clearly tell the learner that the current roadmap no longer matches the new requirements.\n\nYou may help design the revised roadmap, but do not falsely claim that the original roadmap has been updated unless an actual document/email/calendar update occurred.\n\n--------------------------------------------------\n# RESOURCE RULES\n--------------------------------------------------\n\nWhen recommending resources:\n\nPrefer:\n- Official documentation\n- High-quality educational material\n- Reputable courses\n- Relevant books\n- Practical references\n\nDo not recommend resources merely to increase the number of links.\n\nIf the roadmap already specifies resources, prefer those resources unless the learner asks for alternatives.\n\n--------------------------------------------------\n# RESPONSE STYLE\n--------------------------------------------------\n\nBe:\n\n- Clear\n- Practical\n- Concise when the task is simple\n- Detailed when the learner needs teaching\n- Encouraging but not overly motivational\n- Technically accurate\n- Action-oriented\n\nAvoid:\n- Excessive emojis\n- Generic motivational speeches\n- Repeating the user's entire request\n- Unnecessary tool explanations\n- Mentioning internal node names unless useful\n- Saying \"I used a tool\"\n- Exposing internal reasoning\n\nUse Markdown when useful.\n\nPrefer structured responses with:\n- headings\n- bullets\n- numbered steps\n- tables\n- checklists\n- code blocks for code\n\n--------------------------------------------------\n# TOOL RESULT VERIFICATION\n--------------------------------------------------\n\nAfter every external action, inspect the tool result.\n\nOnly report an action as completed when the tool confirms success.\n\nExamples:\n\nDo NOT say:\n\"Your calendar is updated.\"\n\nunless update_event succeeded.\n\nDo NOT say:\n\"I sent the email.\"\n\nunless send_mail succeeded.\n\nDo NOT say:\n\"I created the document.\"\n\nunless create_doc succeeded.\n\nIf a tool fails:\n- Explain the issue briefly.\n- Do not pretend the action succeeded.\n- Offer the next practical step.\n\n--------------------------------------------------\n# ERROR HANDLING\n--------------------------------------------------\n\nIf a tool returns incomplete or unexpected data:\n\n1. Do not invent missing information.\n2. Try a more targeted tool call when appropriate.\n3. If the information is still unavailable, explain what is missing.\n4. Ask the learner only for information that is actually required.\n\n--------------------------------------------------\n# IMPORTANT BEHAVIOR RULES\n--------------------------------------------------\n\n1. Never fabricate roadmap content.\n2. Never fabricate calendar events.\n3. Never fabricate document contents.\n4. Never claim an external action succeeded without confirmation.\n5. Never create duplicate calendar events unnecessarily.\n6. Never modify unrelated calendar events.\n7. Never send unsolicited emails.\n8. Never overwrite useful document content unnecessarily.\n9. Never reveal private credentials or tool internals.\n10. Never assume mastery.\n11. Always adapt explanations to the learner's level.\n12. Prefer practical learning over passive reading.\n13. Keep the learner moving toward measurable outcomes.\n14. Use tools when tools are necessary.\n15. Do not use tools when a direct conversational answer is sufficient.\n\n--------------------------------------------------\n# PRIMARY DECISION LOOP\n--------------------------------------------------\n\nFor every learner message, internally determine:\n\n1. What is the learner asking?\n2. Is this a conversational question or an action?\n3. Does the answer require roadmap information?\n4. Does the answer require external data?\n5. Which tool is appropriate?\n6. Is clarification actually necessary?\n7. What should happen next in the learner's learning journey?\n\nThen execute the smallest number of tool calls necessary.\n\nYour ultimate goal is not merely to answer the learner.\n\nYour goal is to help the learner make measurable progress toward their target.\n\n--------------------------------------------------\n# SUCCESS CRITERIA\n--------------------------------------------------\n\nA successful interaction should leave the learner with at least one of:\n\n- A clearer understanding\n- A completed learning task\n- A practical exercise\n- A scheduled learning session\n- Updated learning material\n- A useful assessment result\n- A clear next step\n- Better alignment with their roadmap\n\nAlways prioritize meaningful learning progress over unnecessary conversation.",
+          "enableStreaming": true
+        }
+      },
+      "id": "a746d1d1-2c4c-4664-9d39-122db5aafafb",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        48,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "1e86d23f-030e-4f48-97f0-c10709c65418",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        512
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "id": "b380e98b-e892-4745-94ad-464051b1dd76",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        64,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Limit', ``, 'number') }}",
+        "filters": {
+          "includeSpamTrash": false,
+          "q": "subject:🗺️ Learning Roadmap :"
+        }
+      },
+      "id": "3ae45bdd-d74f-4606-ad21-dd194722684f",
+      "name": "get_mail",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        832
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "03947fee-80c3-481b-aa5f-e96caa625240",
+      "name": "send_mail",
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -304,
+        832
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": null,
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {
+          "timeZone": {
+            "__rl": true,
+            "value": "Asia/Kolkata",
+            "mode": "list",
+            "cachedResultName": "Asia/Kolkata"
+          }
+        }
+      },
+      "id": "b78f4994-382c-4a39-94a1-5e27e779d84d",
+      "name": "get_event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        880
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "useDefaultReminders": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Use_Default_Reminders', ``, 'boolean') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        },
+        "remindersUi": {
+          "remindersValues": []
+        }
+      },
+      "id": "3ab4b35f-f970-4068-92ba-91e809fe9a58",
+      "name": "set_event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        880
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Calendar', ``, 'string') }}",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "useDefaultReminders": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Use_Default_Reminders', ``, 'boolean') }}",
+        "updateFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "repeatHowManyTimes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Repeat_How_Many_Times_', ``, 'number') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "id": "be5a1705-9a57-44e0-a74a-428de759a38d",
+      "name": "update_event",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        880
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}"
+      },
+      "id": "364463a9-cf76-4274-aae1-211f891970b5",
+      "name": "create_doc",
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        544,
+        880
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": null,
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', ``, 'boolean') }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('actionFields0_Old_Text', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "id": "ecad64fe-7335-44d0-a68e-7a8214f2d790",
+      "name": "update_doc",
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        688,
+        880
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": null,
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doc_ID_or_URL', ``, 'string') }}"
+      },
+      "id": "3c108ab8-04fb-40f0-bc22-b6b35b0e25fb",
+      "name": "retrive_doc",
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        832,
+        880
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": null,
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Gmail Tools\n\n1. Read Roadmap from mail\n2. Send Alerts/deadline message to mail\n",
+        "height": 288,
+        "width": 352,
+        "color": 5
+      },
+      "id": "dfdaf395-2a5f-497d-9d56-acf44c4332fd",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Calendar Tools\n\n1. Read the Events of my Calendar\n2. Sets the Events based on user Request\n3.  Modify the Events based on  requirements\n",
+        "height": 288,
+        "width": 400,
+        "color": 6
+      },
+      "id": "a558dcc1-0963-4d21-a61c-ce61599dd595",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Google Docs Tools\n\n1. Create Doc\n2. Update Doc\n3. Read Doc",
+        "height": 288,
+        "width": 624,
+        "color": 4
+      },
+      "id": "6db2622f-e041-444c-9b00-57b39f7a7fec",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        512,
+        720
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_mail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send_mail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set_event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_doc": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_doc": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retrive_doc": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "d2b72e10-7a67-45e4-91a7-29b62f8827b8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED"
+  },
+  "nodeGroups": [],
+  "id": "64Ct8Gt9rN8Xd7SY",
+  "tags": []
+}
