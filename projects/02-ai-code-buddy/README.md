@@ -59,7 +59,7 @@ graph TD
     StorageAgent --> CreateMD["create_md (Google Drive)"]
 ```
 
-> 🔍 **[Open the interactive version of this diagram →](https://claude.ai/artifact/KegPULayY1MDrBRyzfjtKf)** — scroll or pinch to zoom, drag to pan, closer to actually browsing the n8n canvas than a static image. `ai-code-buddy-architecture.html` in this folder is the same page, self-contained, in case you'd rather host it yourself (e.g. GitHub Pages) than link out.
+
 
 📎 Raw n8n canvas exports — open directly rather than viewing inline (these are DOM-based SVG exports, so they render as a full page but not as an embedded image): [Workflow canvas ↗](./ai-code-buddy-workflow-diagram.svg) · [Sub-workflow canvas ↗](./ai-code-buddy-subworkflow-diagram.svg)
 
